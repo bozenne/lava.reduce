@@ -22,6 +22,7 @@ Collate:
  'Reduce_estimate.R'
  'Reduce_extract.R'
  'Reduce_hook.R'
+ 'Reduce_initCoef.R'
  'Reduce_latent.R'
  'Reduce_lp.R'
  'Reduce_moment.R'

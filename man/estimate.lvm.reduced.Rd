@@ -35,17 +35,14 @@ mR1 <- regression(mR1,y='y1',x='z'\%++\%1:5, reduce = TRUE)
 ## reduced model 2
 mR2 <- reduce(m)
 
-suppressWarnings(
-  start <- estimate(m, d, estimator = "gaussian1", control = list(iter.max = 0))
-)
 ## check estimation
-emGS <- estimate(m, d, control = list(trace = 2, start = coef(start)))
-em1 <- estimate(m, d, estimator = "gaussian1", control = list(trace = 2, start = coef(start)))
-emR1 <- estimate(mR1, d, estimator = "gaussian1", control = list(trace = 2, start = coef(start)[coef(mR1)]))
+emGS <- estimate(m, d)
+em1 <- estimate(m, d, estimator = "gaussian1")
+emR1 <- estimate(mR1, d)
 coef(emGS) - coef(em1)
 coef(em1) - coef(emR1)[names(coef(em1))]
 
-emR2 <- estimate(mR1, d, estimator = "gaussian1", control = list(trace = 2))
+emR2 <- estimate(mR1, d)
 
 #### latent variable model ####
 m <- lvm()
@@ -65,8 +62,8 @@ mR2 <- reduce(m)
 
 ## estimation
 em <- estimate(m,d)
-emR <- estimate(mR1, data = d, control = list(trace=2))
+emR <- estimate(mR1, data = d)
 coef(em)
-coef(emR)
+coef(emR)[names(coef(em))]
 }
 

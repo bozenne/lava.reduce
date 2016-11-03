@@ -29,15 +29,8 @@ Extract the linear predictors of a lvm object
 m <- lvm.reduced()
 m <- regression(m, x=paste0("x",1:10),y="y", reduce = TRUE)
 lp(m)
-
-newLP <- lp(m, type = NULL)[[1]]
-newLP$link <- newLP$link[1:3]
-newLP$con <- newLP$con[1:3]
-newLP$x <- newLP$x[1:3]
-
-lp(m, lp = 1) <- newLP
+lp(m, type = c("x","link"), format = "list2")
 lp(m, type = NULL)
-
 
 ## lvm
 m <- lvm.reduced()
@@ -47,6 +40,6 @@ covariance(m) <- y1~y2
 
 lp(m)
 lp(m, type = "x", format = "list")
-lp(m, lp = 1)
+lp(m, lp = 1, type = "link")
 }
 

@@ -14,7 +14,7 @@ cancelLP(x, ...) <- value
 \method{cancelLP}{lvm.reduced}(x, ...) <- value
 
 \method{cancelLP}{lvm.reduced}(x, link = NULL, lp = NULL, expar = TRUE,
-  simplify = TRUE, ...)
+  restaure = FALSE, simplify = TRUE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}
@@ -26,6 +26,8 @@ cancelLP(x, ...) <- value
 \item{lp}{the name of the linear predictors that should be removed}
 
 \item{expar}{should the external parameters be also removed}
+
+\item{restaure}{should the link be kept while removing the linear predictor}
 
 \item{simplify}{should the class \code{lvm.reduced} be removed is from the \code{lvm}-object if it contains no LP.}
 }
@@ -39,6 +41,8 @@ m <- regression(m, x=paste0("x",1:10),y="y", reduce = TRUE)
 vars(m)
 
 cancelLP(m)
+cancelLP(m, restaure = TRUE)
+
 lp.links <- lp(m, type = "link")
  newm <- cancelLP(m, lp = "LPy", link = lp.links[1:2])
 lp(newm, type = "link")

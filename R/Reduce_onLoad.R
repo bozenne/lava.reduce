@@ -3,6 +3,7 @@
   lava::addhook("lava.reduce.estimate.hook", hook = "estimate.hooks")
   lava::addhook("lava.reduce.post.hook", hook = "post.hooks")
  
+  lava::lava.options(estimator.default.reduce = "2")
 }
 
 '.onAttach' <- function(lib, pkg="lava.reduce") {
@@ -19,5 +20,6 @@ estimate.lvm <- get("estimate.lvm", envir = asNamespace("lava"), inherits = FALS
   
 regression.lvm <- get("regression.lvm", envir = asNamespace("lava"), inherits = FALSE)
   
+procdata.lvm <- get("procdata.lvm", envir = asNamespace("lava"), inherits = FALSE)
 
 

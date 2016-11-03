@@ -14,15 +14,8 @@
 #' m <- lvm.reduced()
 #' m <- regression(m, x=paste0("x",1:10),y="y", reduce = TRUE)
 #' lp(m)
-#' 
-#' newLP <- lp(m, type = NULL)[[1]]
-#' newLP$link <- newLP$link[1:3]
-#' newLP$con <- newLP$con[1:3]
-#' newLP$x <- newLP$x[1:3]
-#' 
-#' lp(m, lp = 1) <- newLP
+#' lp(m, type = c("x","link"), format = "list2")
 #' lp(m, type = NULL)
-#' 
 #' 
 #' ## lvm
 #' m <- lvm.reduced()
@@ -32,7 +25,7 @@
 #' 
 #' lp(m)
 #' lp(m, type = "x", format = "list")
-#' lp(m, lp = 1)
+#' lp(m, lp = 1, type = "link")
 #' @rdname lp 
 #' @export
 `lp` <- function(x,...) UseMethod("lp")
@@ -40,13 +33,13 @@
 #' @rdname lp 
 #' @export
 lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
-  
+ 
   if(length(x$lp)==0){return(NULL)} 
-  validNames <- c("link","con","name","x") # names(x$lp[[1]])
+  validNames <- c("link","con","name","x","endo") # names(x$lp[[1]])
   
   ## type
   if(is.null(type)){
-    type <- validNames
+    type <- c("con","name","x")
     size <- FALSE
     format <- "list2"
   }else if(length(type) == 1 && type == "endogeneous"){
@@ -56,8 +49,8 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
     size <- TRUE
     format <- "list"
   }else{
-    if(type %in% validNames == FALSE){
-      stop("type ",type," is not valid \n",
+    if(any(type %in% validNames == FALSE)){
+      stop("type \"",paste(type[type %in% validNames == FALSE], collapse = "\" \""),"\" is not valid \n",
            "valid types: \"",paste(validNames, collapse = "\" \""),"\" \n")
     }
     size <- FALSE
@@ -72,6 +65,14 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
       }else{
         x$lp[[iterLP]]$link <- NULL
       }
+    }
+    
+  }
+  
+  if("endo" %in% type){
+    
+    for(iterLP in names(x$lp)){
+        x$lp[[iterLP]]$endo <- iterLP
     }
     
   }
@@ -184,10 +185,10 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
       lp <- match(lp, vec)
     }
     
-    if(length(lp) == 1 && length(value) == 4 && all(names(value) == c("link","con","name","x"))){
+    if(length(lp) == 1 && length(value) == 3 && all(names(value) == c("con","name","x"))){
       value <- list(value)
     }
-    
+
     x$lp[lp] <- value
     
   }
@@ -204,6 +205,7 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
 #' @param link,value the name of the links that should be removed
 #' @param lp the name of the linear predictors that should be removed
 #' @param expar should the external parameters be also removed
+#' @param restaure should the link be kept while removing the linear predictor
 #' @param simplify should the class \code{lvm.reduced} be removed is from the \code{lvm}-object if it contains no LP.
 #' @param ... argument passed to \code{cancelLP.lvm.reduced}
 #' 
@@ -214,6 +216,8 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
 #' vars(m)
 #' 
 #' cancelLP(m)
+#' cancelLP(m, restaure = TRUE)
+#' 
 #' lp.links <- lp(m, type = "link")
 #'  newm <- cancelLP(m, lp = "LPy", link = lp.links[1:2])
 #' lp(newm, type = "link")
@@ -237,7 +241,7 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
 
 #' @rdname cancelLP
 #' @export
-cancelLP.lvm.reduced  <- function(x, link = NULL, lp = NULL, expar = TRUE, simplify = TRUE, ...){
+cancelLP.lvm.reduced  <- function(x, link = NULL, lp = NULL, expar = TRUE, restaure = FALSE, simplify = TRUE, ...){
   
   if(is.null(lp)){
     lp <- lp(x) 
@@ -267,22 +271,32 @@ cancelLP.lvm.reduced  <- function(x, link = NULL, lp = NULL, expar = TRUE, simpl
   
   ## removing variable in the LP
   for(iterLP in 1:n.lp){
-    newlp <- lp(x, type = NULL, lp = names.lp[iterLP])[[1]]
     
-    indexRM <- which(newlp$link %in% link[[iterLP]])
+    newlp <- lp(x, type = c("x","con","name","link"), lp = names.lp[iterLP], format = "list2")
+    newlp.link <- newlp[[1]]$link
+    newlp.x <- newlp[[1]]$x
+    
+    indexRM <- which(newlp.link %in% link[[iterLP]])
     
     if(length(indexRM) != length(link[[iterLP]])){
-      stop("unknown links: \"",paste(link[[iterLP]][link[[iterLP]] %in% newlp$link == FALSE], collapse = "\" \""),"\" \n",
-           "possible links for ",names.lp[iterLP],": \"",paste(newlp$link[newlp$link %in% link[[iterLP]] == FALSE], collapse = "\" \""),"\" \n")
+      stop("unknown links: \"",paste(link[[iterLP]][link[[iterLP]] %in% newlp.link == FALSE], collapse = "\" \""),"\" \n",
+           "possible links for ",names.lp[iterLP],": \"",paste(newlp.link[newlp.link %in% link[[iterLP]] == FALSE], collapse = "\" \""),"\" \n")
     }
     
-    newlp$link <- newlp$link[-indexRM]
-    newlp$con <- newlp$con[-indexRM]
-    newlp$x <- newlp$x[-indexRM]
+    if(restaure){
+      f <- as.formula(paste( lp(x, type = "endo", lp = iterLP), "~",  paste(newlp.x[indexRM], collapse = " + ") ) )
+      regression(x) <- f
+    }
+
+
+    newlp[[1]]$link <- NULL
+    newlp[[1]]$con <- newlp[[1]]$con[-indexRM]
+    newlp[[1]]$x <- newlp[[1]]$x[-indexRM]
     
     lp(x, lp = names.lp[iterLP]) <- newlp
+   
   }
-  
+   
   ## remove empty LP
   n.link <- lp(x, type = "n.link")
   if(any(n.link==0)){

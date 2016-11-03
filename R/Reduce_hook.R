@@ -35,8 +35,8 @@ lava.reduce.estimate.hook <- function(x,data,weight,weight2,estimator,...) {
     if(is.null(dots$optim$start)){ # intialisation of the parameters
       
       ## non LP
-      x0 <- cancelLP(x, simplify = TRUE) # remove LP and external parameters
-      startLVM <- lava::estimate(x0, data = data, quick = TRUE) # starting value for the submodel without lp (i.e. values set to 0)
+      x0 <- cancelLP(x, restaure = TRUE, simplify = TRUE) # remove LP and external parameters
+      startLVM <- initCoef(x0, data = data, optim = dots$optim)
       
       ## update
       dots$optim$start <- stats::setNames(rep(0, length = length(coef(x))), coef(x))
@@ -46,7 +46,7 @@ lava.reduce.estimate.hook <- function(x,data,weight,weight2,estimator,...) {
     
     ## update estimator
     if(estimator == "gaussian"){
-      estimator <- "gaussian1"
+      estimator <- paste0("gaussian", lava.options()$estimator.default.reduce)
     }
     
     validEstimator <- paste0("gaussian",c("",1,2))

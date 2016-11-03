@@ -151,6 +151,9 @@ gaussianLP_hessian.lvm <- function(x, p, n, type,...) {
 
 #' @rdname momentLVMr
 #' @export
+gaussian1LP_method.lvm <- gaussianLP_method.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian1LP_logLik.lvm <- gaussianLP_logLik.lvm
 #' @rdname momentLVMr
 #' @export
@@ -167,6 +170,9 @@ gaussian1LP_hessian.lvm <- function(x, type, ...){
   gaussianLP_hessian.lvm(x, type = "num", ...)
 }
 
+#' @rdname momentLVMr
+#' @export
+gaussian2LP_method.lvm <- gaussianLP_method.lvm
 #' @rdname momentLVMr
 #' @export
 gaussian2LP_logLik.lvm <- gaussianLP_logLik.lvm

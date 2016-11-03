@@ -5,11 +5,13 @@
 \alias{gaussian1LP_gradient.lvm}
 \alias{gaussian1LP_hessian.lvm}
 \alias{gaussian1LP_logLik.lvm}
+\alias{gaussian1LP_method.lvm}
 \alias{gaussian1LP_objective.lvm}
 \alias{gaussian1LP_score.lvm}
 \alias{gaussian2LP_gradient.lvm}
 \alias{gaussian2LP_hessian.lvm}
 \alias{gaussian2LP_logLik.lvm}
+\alias{gaussian2LP_method.lvm}
 \alias{gaussian2LP_objective.lvm}
 \alias{gaussian2LP_score.lvm}
 \alias{gaussianLP_gradient.lvm}
@@ -34,6 +36,8 @@ gaussianLP_score.lvm(x, p, data, indiv = FALSE, ...)
 
 gaussianLP_hessian.lvm(x, p, n, type, ...)
 
+gaussian1LP_method.lvm
+
 gaussian1LP_logLik.lvm(object, p, data, ...)
 
 gaussian1LP_objective.lvm(x, p, data, ...)
@@ -43,6 +47,8 @@ gaussian1LP_score.lvm(x, p, data, indiv = FALSE, ...)
 gaussian1LP_gradient.lvm(x, p, data, ...)
 
 gaussian1LP_hessian.lvm(x, type, ...)
+
+gaussian2LP_method.lvm
 
 gaussian2LP_logLik.lvm(object, p, data, ...)
 

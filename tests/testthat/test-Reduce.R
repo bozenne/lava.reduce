@@ -217,3 +217,29 @@ LVM1.red <- estimate(m, data = d,
                      estimator = "gaussian1")
 )
 # automatic switch to y3 as a reference
+
+
+#### bug to fix ####
+
+if(FALSE){
+set.seed(10)
+
+# model
+m <- lvm()
+m <- regression(m,y='y1',x='x'%++%1:5)
+mR <- reduce(m)
+
+# simul
+d <- sim(m,50)
+
+e <- estimate(mR,d, estimator = "gaussian2", control = list(trace = 2))
+
+estimate(mR,d, estimator = "gaussian2", control = list(trace = 2, method = "nlminb2"))
+estimate(m,d, estimator = "gaussian2", control = list(trace = 2, method = "nlminb2"))
+
+estimate(mR,d, estimator = "gaussian2", control = list(trace = 2, method = "NR"))
+estimate(m,d, estimator = "gaussian2", control = list(trace = 2, method = "NR"))
+
+estimate(mR,d, estimator = "gaussian2", control = list(trace = 2, method = "nlminb1"))
+estimate(m,d, estimator = "gaussian2", control = list(trace = 2, method = "nlminb1"))
+}

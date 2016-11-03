@@ -2,7 +2,7 @@ Package: lava.reduce
 Type: Package
 Title: Latent Variable Models with linear predictor
 Version: 0.0
-Date: 2016-48-02
+Date: 2016-11-03
 Author: Brice Ozenne[aut, cre]
 Maintainer: brice ozenne <brice.ozenne@orange.fr>
 Description: Latent variable models with linear predictors. Should enable a faster optimisation when dealing with a large number of variables.
@@ -10,12 +10,19 @@ License: GPL-3
 Depends:
     R (>= 3.3),
     lava
+Imports:
+    mets,
+    numDeriv
+Suggests:
+	testthat
 RoxygenNote: 5.0.1
 Collate:
- 'lava_reduce-package.R'
+ 'lava.reduce-package.R'
  'Reduce_estimate.R'
  'Reduce_extract.R'
  'Reduce_hook.R'
+ 'Reduce_latent.R'
+ 'Reduce_lp.R'
  'Reduce_moment.R'
  'Reduce_object.R'
  'Reduce_onLoad.R'

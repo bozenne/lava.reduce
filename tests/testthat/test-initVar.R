@@ -4,7 +4,7 @@
 
 context("#### initVar #### \n")
 
-initVar_link <-  lava.penalty:::initVar_link
+initVar_link <-  lava.reduce:::initVar_link
 
 lava.options(symbol = c("~",","))
 initVar_link(var1 = a~b)

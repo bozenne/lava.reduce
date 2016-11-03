@@ -4,7 +4,20 @@
 \alias{calcLP.lvm}
 \title{Compute the linear predictor}
 \usage{
-calcLP.lvm(x, p, data, lp.x, lp.link, lp.endo)
+calcLP.lvm(x, p, data, lp.x, lp.link, lp.name)
+}
+\arguments{
+\item{x}{\code{lvm.reduced}-object}
+
+\item{p}{current parameter estimate}
+
+\item{data}{dataset}
+
+\item{lp.x}{the name of the exogeneous variables involved in the LP}
+
+\item{lp.link}{list containing for each LP the name of the links}
+
+\item{lp.name}{list containing for each LP its name}
 }
 \description{
 Compute the value of the linear predictors of a LVM and store it into the dataset

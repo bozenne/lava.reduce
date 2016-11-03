@@ -5,20 +5,24 @@
 \title{Add regression association to a latent variable model with linear predictor}
 \usage{
 \method{regression}{lvm.reduced}(object = lvm(), to, from, y, x,
-  reduce = FALSE, ...)
+  reduce = FALSE, value, ...)
 }
 \arguments{
+\item{object}{\code{lvm}-object}
+
 \item{to}{Character vector of outcome(s) or formula object.}
 
 \item{from}{Character vector of predictor(s).}
 
 \item{y}{Alias for 'to'}
 
-\item{x}{\code{lvm}-object}
+\item{x}{Alias for 'from'}
 
 \item{reduce}{should the from variable be grouped into a linear predictor}
 
-\item{x}{Alias for 'from'}
+\item{value}{A formula specifying the linear constraints or if \code{to=NULL} a \code{list} of parameter values.}
+
+\item{...}{additional arguments to be passed to \code{regression.lvm}}
 }
 \description{
 Same as regression for latent variable model with an argument reduce to introduce linear predictors

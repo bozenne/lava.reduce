@@ -1,4 +1,4 @@
-checkMoment <- function(lvmRed, elvm, param = coef(e), data = elvm$data$model.frame){
+checkMoment <- function(lvmRed, elvm, param = coef(elvm), data = elvm$data$model.frame){
   
   indexRED <- na.omit(match(coef(lvmRed),names(param)))
   

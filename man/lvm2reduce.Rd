@@ -9,4 +9,7 @@ lvm2reduce(x)
 \arguments{
 \item{x}{\code{lvm}-object}
 }
+\description{
+Add the possibility to use linear predictor in a latent variable model
+}
 

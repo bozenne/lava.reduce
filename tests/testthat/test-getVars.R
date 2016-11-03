@@ -94,8 +94,8 @@ lp.name <- lp(m)
 
 test_that("lp - reduce all model", {
   
-  expect_equal(unname(lp(m, type = "x", lp = lp.name[1])), exo.name[[1]])
-  expect_equal(unname(lp(m, type = "x", lp = lp.name[2])), exo.name[[2]])
-  expect_equal(unname(lp(m, type = "x", lp = lp.name[3])), exo.name[[3]])
+  expect_equal(sort(unname(lp(m, type = "x", lp = lp.name[1]))), sort(exo.name[[1]]))
+  expect_equal(sort(unname(lp(m, type = "x", lp = lp.name[2]))), sort(exo.name[[2]]))
+  expect_equal(sort(unname(lp(m, type = "x", lp = lp.name[3]))), sort(exo.name[[3]]))
   
 })

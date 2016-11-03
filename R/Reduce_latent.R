@@ -3,14 +3,17 @@
 #' 
 #' @param x \code{lvm}-object
 #' @param value the names of the latent variables
-`latent<-.lvm.reduced` <- function(x,value, ...){
+#' @param ... additional arguments to be passed to the low level functions
+#' 
+#' @export
+`latent<-.lvm.reduced` <- function(x, ..., value){
  
-  x <- lava:::`latent<-.lvm`(x, value = value, ...)
+  x <- `latent<-.lvm`(x, value = value, ...) # [WARNING lava:::]
   
-  if(!is.null(latent(x))){
+  if(!is.null(lava::latent(x))){
     
-    if(any(latent(x) %in% lp(x, type = "x"))){
-      latent.pb <- latent(x)[latent(x) %in% lp(x, type = "x")]
+    if(any(lava::latent(x) %in% lp(x, type = "x"))){
+      latent.pb <- lava::latent(x)[lava::latent(x) %in% lp(x, type = "x")]
       n.pb <- length(latent.pb)
       stop("the latent variable",if(n.pb>1){"s"}," \"",paste(latent.pb, collapse = "\" \""),"\" must not be contained in a linear predictor \n")
     }

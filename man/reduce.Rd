@@ -2,12 +2,19 @@
 % Please edit documentation in R/Reduce_object.R
 \name{reduce}
 \alias{reduce}
+\alias{reduce.lvm}
 \title{Reduce latent variable model}
 \usage{
 reduce(x, ...)
+
+\method{reduce}{lvm}(x, link = NULL, endo = NULL, rm.exo = TRUE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}
+
+\item{...}{additional arguments to be passed to the low level functions}
+
+\item{link}{the links that should be aggregated into linear predictors}
 
 \item{endo}{the endogeneous variables for which the related exogeneous variables should be aggregated}
 

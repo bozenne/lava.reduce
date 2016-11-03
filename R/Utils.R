@@ -19,7 +19,7 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
       sep <- Scov
     }
     if(grepl(Slink,var1)==TRUE){
-      var1 <- as.formula(gsub(Slink,"~",var1))
+      var1 <- stats::as.formula(gsub(Slink,"~",var1))
       sep <- if(format == "formula"){"~"}else{Slink}
     }
   }else{
@@ -27,7 +27,7 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
   }
   
   if(class(var1) == "formula"){
-    var2 <- all.vars(delete.response(terms(var1)))
+    var2 <- all.vars(stats::delete.response(stats::terms(var1)))
     n.var2 <- length(var2)
     var1 <- setdiff(all.vars(var1),var2)
   }
@@ -36,7 +36,7 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
   if(format == "formula"){
     n.var2 <- length(var2)
     var1 <- rep(var1, times = n.var2)
-    res <- sapply(1:n.var2, function(i){as.formula(paste(var1[i], var2[i], sep = sep))})
+    res <- sapply(1:n.var2, function(i){stats::as.formula(paste(var1[i], var2[i], sep = sep))})
     
   }else if(format == "txt.formula"){
     n.var2 <- length(var2)

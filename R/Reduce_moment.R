@@ -1,17 +1,39 @@
+
+#' @title Moments for a reduced lvm model
+#' @name momentLVMr
+#' @description Compute the likelihood, score and hessian of a reduced lvm model
+#' 
+#' @param x,object \code{lvm.reduced}-object
+#' @param p current parameter estimate
+#' @param data dataset
+#' @param n number of observations
+#' @param indiv should the individual contribution be returned? Else average over the observations
+#' @param type method used to compute the hessian
+#' @param ... additional arguments
+#' 
+#' @details this function assumes that the external parameters in p are at the end of the vector
+#' 
+
+#' @rdname momentLVMr
+#' @export
 gaussianLP_method.lvm <- "nlminb2"
 
+#' @rdname momentLVMr
+#' @export
 gaussianLP_objective.lvm <- function(x, p, data, ...){ 
   l <- gaussianLP_logLik.lvm(x, p=p, data=data, ...)
   return(-l)
 }
 
 
+#' @rdname momentLVMr
+#' @export
 gaussianLP_logLik.lvm <- function(object, p, data, ...)  {
-  
-  dataLP <- calcLP.lvm(object, p = p, data = data, 
+ 
+   dataLP <- calcLP.lvm(object, p = p, data = data, 
                        lp.x = lp(object, type = "x", format = "list"), 
                        lp.link = lp(object, type = "link", format = "list"), 
-                       lp.endo = lp(object, type = "endogeneous"))
+                       lp.name = lp(object, type = "name"))
   
   ## from normal_objective.lvm
   y <- lava::index(object)$endogenous
@@ -20,7 +42,7 @@ gaussianLP_logLik.lvm <- function(object, p, data, ...)  {
   bin <- tryCatch(match(do.call("binary",list(x=object)),y),error=function(x) NULL)
   status[match(ord,y)] <- 2
   
-  mu <- predict(object,data=dataLP,p=p) ## can be optimized
+  mu <- stats::predict(object,data=dataLP,p=p) ## can be optimized
   S <- attributes(mu)$cond.var
   class(mu) <- "matrix"
   thres <- matrix(0,nrow=length(y),max(1,attributes(ord)$K-1)); rownames(thres) <- y
@@ -38,12 +60,13 @@ gaussianLP_logLik.lvm <- function(object, p, data, ...)  {
       !inherits(yu[1,1],c("numeric","integer","logical")))
     stop("Unexpected data (normal_objective)")
   
-  l <- mets::loglikMVN(yl = yl, yu = yu, status = status, mu = mu, S = S, thres = thres)
-  l <- sum(l)
+  l <- sum(mets::loglikMVN(yl = yl, yu = yu, status = status, mu = mu, S = S, thres = thres))
   
   return(l)
 }
 
+#' @rdname momentLVMr
+#' @export
 gaussianLP_gradient.lvm <- function(x, p, data, ...){
   val <- -gaussianLP_score.lvm(x, p = p, data = data, ...)
   if (!is.null(nrow(val))) {
@@ -53,10 +76,8 @@ gaussianLP_gradient.lvm <- function(x, p, data, ...){
   return(val)
 }
 
-#' @title Compute the score for a reduced lvm model
-#'
-#' @details this function assumes that the external parameters in p are at the end of the vector
-#' 
+#' @rdname momentLVMr
+#' @export
 gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, ...)  {
   
   if(is.matrix(p)){
@@ -67,12 +88,12 @@ gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, ...)  {
   lp.x <- lp(x, type = "x", format = "list")
   
   dataLP <- calcLP.lvm(x, p = p, data = data, 
-                       lp.x = lp.x, lp.link = lp.link, lp.endo = lp.endo)
-  
+                       lp.x = lp.x, lp.link = lp.link, lp.name = lp(x, type = "name"))
+
   ## from normal_gradient.lvm
   M <- moments(x,p)
-  Y <- as.matrix(dataLP[,manifest(x)])
-  D <- lava:::deriv.lvm(x,p=p)
+  Y <- as.matrix(dataLP[,lava::manifest(x)])
+  D <- deriv.lvm(x,p=p) # [WARNING lava:::]
   mu <- M$xi%x%rep(1,nrow(Y))
   
   s <- mets::scoreMVN(Y,mu,M$C,D$dxi,D$dS)
@@ -96,7 +117,9 @@ gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, ...)  {
   return(s) 
 }
 
-gaussianLP_hessian.lvm <- function(x,p,n,type,...) {
+#' @rdname momentLVMr
+#' @export
+gaussianLP_hessian.lvm <- function(x, p, n, type,...) {
   dots <- list(...);
   
   if(type == "E"){
@@ -111,12 +134,12 @@ gaussianLP_hessian.lvm <- function(x,p,n,type,...) {
     return( I )
   }else if(type == "information"){ ## true part
     
-    lp.endo <- lp(x, type = "endogeneous")
+    lp.name <- lp(x, type = "name")
     lp.link <- lp(x, type = "link", format = "list")
     lp.x <- lp(x, type = "x", format = "list")
     
     dataLP <- calcLP.lvm(x, p = p, data = dots$data, 
-                         lp.x = lp.x, lp.link = lp.link, lp.endo = lp.endo)
+                         lp.x = lp.x, lp.link = lp.link, lp.name = lp.name)
     
     ## direct
     I <- information(x=x, p=p, n=n, data = dataLP)
@@ -126,18 +149,38 @@ gaussianLP_hessian.lvm <- function(x,p,n,type,...) {
   
 }
 
+#' @rdname momentLVMr
+#' @export
 gaussian1LP_logLik.lvm <- gaussianLP_logLik.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian1LP_objective.lvm <- gaussianLP_objective.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian1LP_score.lvm <- gaussianLP_score.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian1LP_gradient.lvm <- gaussianLP_gradient.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian1LP_hessian.lvm <- function(x, type, ...){
   gaussianLP_hessian.lvm(x, type = "num", ...)
 }
 
+#' @rdname momentLVMr
+#' @export
 gaussian2LP_logLik.lvm <- gaussianLP_logLik.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian2LP_objective.lvm <- gaussianLP_objective.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian2LP_score.lvm <- gaussianLP_score.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian2LP_gradient.lvm <- gaussianLP_gradient.lvm
+#' @rdname momentLVMr
+#' @export
 gaussian2LP_hessian.lvm <- function(x, type, ...){
   gaussianLP_hessian.lvm(x, type = "E", ...)
 }
@@ -146,11 +189,15 @@ gaussian2LP_hessian.lvm <- function(x, type, ...){
 
 #' @title Compute the linear predictor
 #' @description Compute the value of the linear predictors of a LVM and store it into the dataset
+#' 
+#' @inheritParams momentLVMr
+#' @param lp.x the name of the exogeneous variables involved in the LP
+#' @param lp.link list containing for each LP the name of the links
+#' @param lp.name list containing for each LP its name
 calcLP.lvm <- function(x, p, data,
-                       lp.x, lp.link, lp.endo){
-  
+                       lp.x, lp.link, lp.name){
+
   pext <- modelVar(x,p)$e # redefine p with names (only external parameters)
-  lp.name <- lp(x, type = "name")
   n.lp <- length(lp.name)
   
   for(iterLP in 1:n.lp){
@@ -158,15 +205,15 @@ calcLP.lvm <- function(x, p, data,
     b <- pext[lp.link[[iterLP]]] # x$lp$y1$con
     
     ## compute linear predictor for the reduce model
-    # form <- as.formula(paste0("~0+",paste(lp.x,collapse = "+")))
+    # form <- stats::as.formula(paste0("~0+",paste(lp.x,collapse = "+")))
     # as.matrix(model.matrix(form, data))
     # if(is.data.table(data)){
-    #   data[,lp.name[[iterLP]] := as.matrix(.SD) %*% b, with = FALSE, .SDcols = lp.x[[iterLP]]] 
+    #   data[,lp.endo[[iterLP]] := as.matrix(.SD) %*% b, with = FALSE, .SDcols = lp.x[[iterLP]]] 
     # }else{
       X <- as.matrix(data[,lp.x[[iterLP]],drop = FALSE]) 
       data[,lp.name[iterLP]] <- X %*% b
     # }
-   
+ 
   }
   return(data)
 }

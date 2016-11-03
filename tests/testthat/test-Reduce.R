@@ -3,6 +3,8 @@
 # library(lava)
 # butils:::package.source("lava.reduce", Rcode = TRUE, RorderDescription = FALSE)
 
+gaussian1LP_gradient.lvm <- lava.reduce:::gaussian1LP_gradient.lvm
+  
 context("#### Reduce #### \n")
 
 m <- lvm()
@@ -43,7 +45,14 @@ test_that("Regression: moment reduce", {
   g2 <- lava:::gaussian1_gradient.lvm(x = m, data=d, p=start, S = e$S, n = e$data$n, mu = e$mu)
   expect_equal(unname(g1), g2[index])
   
-  checkMoment(m.red, e)
+  gaussianLP_logLik.lvm <- lava.reduce:::gaussianLP_logLik.lvm
+  gaussianLP_gradient.lvm <- lava.reduce:::gaussianLP_gradient.lvm
+  gaussianLP_score.lvm <- lava.reduce:::gaussianLP_score.lvm
+  gaussianLP_hessian.lvm <- lava.reduce:::gaussianLP_hessian.lvm
+  gaussian1LP_hessian.lvm <- lava.reduce:::gaussian1LP_hessian.lvm
+  gaussian2LP_hessian.lvm <- lava.reduce:::gaussian2LP_hessian.lvm
+  
+  # checkMoment(m.red, e)
     
 })
 
@@ -91,7 +100,7 @@ m.red2 <- reduce(m, endo = "y3")
 set.seed(10)
 d <- sim(m,5e2, latent = FALSE)
 start <- setNames(rep(0, length(coef(m))), coef(m))
-start[grep("~", names(start))] <- 1
+start[grep(lava.options()$symbol[1], names(start))] <- 1
 suppressWarnings(
   startLVM <- coef(estimate(m, data = d, control = list(iter.max = 0)))
 )
@@ -162,14 +171,14 @@ test_that("LVM: lvm vs lvm.reduce (gaussian 2)", {
   
   suppressWarnings(
     LVM1.red <- estimate(m.red1, data = d, 
-                         control = list(iter.max = iter.max, start = start1, method = method, trace = 2), quick = TRUE, 
+                         control = list(iter.max = iter.max, start = start1, method = method), quick = TRUE, 
                          estimator = "gaussian2")
   )
   
   
   suppressWarnings(
     LVM2.red <- estimate(m.red2, data = d, 
-                         control = list(iter.max = iter.max, start = start2, method = method, trace = 2), quick = TRUE, 
+                         control = list(iter.max = iter.max, start = start2, method = method), quick = TRUE, 
                          estimator = "gaussian2")
   )
   
@@ -202,7 +211,9 @@ d <- sim(m,5e2, latent = FALSE)
 
 m <- reduce(m)
 
+suppressWarnings(
 LVM1.red <- estimate(m, data = d, 
                      control = list(iter.max = 1), quick = TRUE, 
                      estimator = "gaussian1")
+)
 # automatic switch to y3 as a reference

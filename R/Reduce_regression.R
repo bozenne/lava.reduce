@@ -1,12 +1,14 @@
 #' @title Add regression association to a latent variable model with linear predictor
 #' @description Same as regression for latent variable model with an argument reduce to introduce linear predictors
 #' 
-#' @param x \code{lvm}-object
+#' @param object \code{lvm}-object
 #' @param to Character vector of outcome(s) or formula object.
 #' @param from Character vector of predictor(s).
 #' @param y	Alias for 'to'
 #' @param x	Alias for 'from'
 #' @param reduce should the from variable be grouped into a linear predictor
+#' @param value A formula specifying the linear constraints or if \code{to=NULL} a \code{list} of parameter values.
+#' @param ... additional arguments to be passed to \code{regression.lvm}
 #' 
 #' @examples 
 #' 
@@ -14,7 +16,8 @@
 #' m <- regression(m,y='y1',x='x'%++%1:2)
 #' m <- regression(m,y='y1',x='z'%++%1:5, reduce = TRUE)
 #' 
-regression.lvm.reduced <- function(object = lvm(), to, from, y, x, reduce = FALSE, ...){
+#' @export
+regression.lvm.reduced <- function(object = lvm(), to, from, y, x, reduce = FALSE, value, ...){
   
   if(identical(reduce,TRUE)  || is.character(reduce)){
     
@@ -36,32 +39,32 @@ regression.lvm.reduced <- function(object = lvm(), to, from, y, x, reduce = FALS
     }
     if (inherits(to, "formula")) {
       if (!missing(value)) {
-        regression(object, to, reduce = reduce, ...) <- value
+        lava::regression(object, to, reduce = reduce, ...) <- value
       }
       else {
-        regression(object, reduce = reduce, ...) <- to
+        lava::regression(object, reduce = reduce, ...) <- to
       }
       object$parpos <- NULL
       return(object)
     }
     if (is.list(to)) {
-      for (t in to) regression(object, reduce = reduce, ...) <- t
+      for (t in to) lava::regression(object, reduce = reduce, ...) <- t
       object$parpos <- NULL
       return(object)
     }
     
     #### reduce
-    if(any(from %in% latent(object))){
+    if(any(from %in% lava::latent(object))){
       stop("cannot integrate latent variables in the linear predictor \n",
-           "latent variable: \"",paste(from[from %in% latent(object)], collapse = "\" \""),"\" \n")
+           "latent variable: \"",paste(from[from %in% lava::latent(object)], collapse = "\" \""),"\" \n")
     }
     
-    if(any(from %in% endogenous(object))){
+    if(any(from %in% lava::endogenous(object))){
       stop("cannot integrate endogenous variables in the linear predictor \n",
-           "endogenous: \"",paste(from[from %in% endogenous(object)], collapse = "\" \""),"\" \n")
+           "endogenous: \"",paste(from[from %in% lava::endogenous(object)], collapse = "\" \""),"\" \n")
     }
     
-    allCoef <- coef(regression(object, to = to, from = from, reduce = FALSE, ...))
+    allCoef <- coef(lava::regression(object, to = to, from = from, reduce = FALSE, ...))
     if(!identical(reduce,TRUE) && length(reduce)!=length(to)){
       stop("wrong specification of argument \'reduce\' \n",
            "must be TRUE or a character vector of size ",length(to),"\n")
@@ -70,7 +73,7 @@ regression.lvm.reduced <- function(object = lvm(), to, from, y, x, reduce = FALS
     if("lp" %in% names(object) == FALSE){object$lp <- list()}
     for(iterR in to){ ### I don't know where to get the constrains
       name.LP <- if(reduce==TRUE){paste0("LP",iterR)}else{reduce}
-      regression(object, to = iterR, from = name.LP, reduce = FALSE, ...) <- 1
+      lava::regression(object, to = iterR, from = name.LP, reduce = FALSE, ...) <- 1
       if(iterR %in% names(object$lp)){ 
         # object$lp[[iterR]]$indexCoef <- match(object$lp[[iterR]]$indexCoef, coef(object))
         object$lp[[iterR]]$x <- c(object$lp[[iterR]]$x, from)
@@ -82,12 +85,12 @@ regression.lvm.reduced <- function(object = lvm(), to, from, y, x, reduce = FALS
         object$lp[[iterR]]$name <- name.LP
       }
     }
-    parameter(object) <- setdiff(allCoef,coef(object))
+    lava::parameter(object) <- setdiff(allCoef,coef(object))
     return(object)
     
   }else {
     
-    return(lava:::regression.lvm(object = object, to = to, from = from, y = y, x = x, ...))
+    return(regression.lvm(object = object, to = to, from = from, y = y, x = x, ...)) # [WARNING lava:::]
     
   }
   

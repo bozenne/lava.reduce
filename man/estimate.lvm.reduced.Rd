@@ -6,6 +6,13 @@
 \usage{
 \method{estimate}{lvm.reduced}(x, data, ...)
 }
+\arguments{
+\item{x}{\code{lvm.reduced}-object}
+
+\item{data}{\code{data.frame}}
+
+\item{...}{additional arguments to be passed to the low level functions}
+}
 \description{
 Add columns corresponding to the LPs in the dataset (filled with 0) so that LPs are not treated as a latent variable
 }
@@ -19,7 +26,7 @@ m <- regression(m,y='y1',x='z'\%++\%1:5)
 
 set.seed(10)
 d <- sim(m,150)
-  
+
 ## reduced model 1
 mR1 <- lvm.reduced()
 mR1 <- regression(mR1,y='y1',x='x'\%++\%1:2)
@@ -28,20 +35,17 @@ mR1 <- regression(mR1,y='y1',x='z'\%++\%1:5, reduce = TRUE)
 ## reduced model 2
 mR2 <- reduce(m)
 
+suppressWarnings(
+  start <- estimate(m, d, estimator = "gaussian1", control = list(iter.max = 0))
+)
 ## check estimation
-em1 <- estimate(m, d, estimator = "gaussian1", control = list(trace = 2))
-emR1 <- estimate(mR1, d, estimator = "gaussian1", control = list(trace = 2))
+emGS <- estimate(m, d, control = list(trace = 2, start = coef(start)))
+em1 <- estimate(m, d, estimator = "gaussian1", control = list(trace = 2, start = coef(start)))
+emR1 <- estimate(mR1, d, estimator = "gaussian1", control = list(trace = 2, start = coef(start)[coef(mR1)]))
+coef(emGS) - coef(em1)
 coef(em1) - coef(emR1)[names(coef(em1))]
 
-#### penalization ####
-mp <- m
-penalize(mp) <- grep("x", coef(m),value = TRUE)
-rmp <- reduce(mp)
-
-epm <- estimate(mp,d,lambda1 = 1e5, control = list (trace = 2, iter.max = 2000))
-epmR <- estimate(rmp,d,lambda1 = 1e5, control = list (trace = 2, iter.max = 2000))
-coef(epm) - coef(epmR)[names(coef(epm))]
-
+emR2 <- estimate(mR1, d, estimator = "gaussian1", control = list(trace = 2))
 
 #### latent variable model ####
 m <- lvm()
@@ -62,6 +66,7 @@ mR2 <- reduce(m)
 ## estimation
 em <- estimate(m,d)
 emR <- estimate(mR1, data = d, control = list(trace=2))
-
+coef(em)
+coef(emR)
 }
 

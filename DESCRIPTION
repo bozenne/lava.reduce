@@ -14,7 +14,8 @@ Imports:
     mets,
     numDeriv
 Suggests:
-	testthat
+	testthat,
+	Matrix
 RoxygenNote: 5.0.1
 Collate:
  'lava.reduce-package.R'

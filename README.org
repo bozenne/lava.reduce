@@ -1,0 +1,6 @@
+#+BEGIN_HTML
+<a href="https://travis-ci.org/bozenne/lava.reduce"><img src="https://travis-ci.org/bozenne/lava.reduce.svg?branch=master"></a>
+#+END_HTML
+
+# lava.reduce
+lava plugin allowing LVM with linear predictors

@@ -68,8 +68,9 @@ gaussianLP_logLik.lvm <- function(object, p, data, ...)  {
 #' @rdname momentLVMr
 #' @export
 gaussianLP_gradient.lvm <- function(x, p, data, ...){
+  
   val <- -gaussianLP_score.lvm(x, p = p, data = data, ...)
-  if (!is.null(nrow(val))) {
+  if (NROW(val)>1) {
     val <- colSums(val)
   }
   # val <- unname(val)
@@ -92,11 +93,13 @@ gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, ...)  {
 
   ## from normal_gradient.lvm
   M <- moments(x,p)
-  Y <- as.matrix(dataLP[,lava::manifest(x)])
   D <- deriv.lvm(x,p=p) # [WARNING lava:::]
-  mu <- M$xi%x%rep(1,nrow(Y))
   
-  s <- mets::scoreMVN(Y,mu,M$C,D$dxi,D$dS)
+  s <- mets::scoreMVN(y = as.matrix(dataLP[,lava::manifest(x)]),
+                      mu = M$xi%x%rep(1,NROW(dataLP)),
+                      S= M$C,
+                      dmu = D$dxi,
+                      dS = D$dS)
   colnames(s) <- coef(x)#c(name.intercept,name.regression,name.covariance)
   
   ## apply chain rule

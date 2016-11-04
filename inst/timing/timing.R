@@ -30,19 +30,19 @@ for(iter.grid in 1:n.grid){
 
   tps1 <- system.time(
     e1 <- tryCatch(evalWithTimeout(estimate(m,d), timeout = time.out), silent = TRUE, 
-                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA, method = "nlminb2")))})
+                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA), control = list(method = "nlminb2")))})
   )
   tps2 <- system.time(
     e2 <- tryCatch(evalWithTimeout(estimate(m,d, estimator = "gaussian2"), timeout = time.out), silent = TRUE, 
-                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA, method = "NR")))})
+                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA), control = list(method = "NR")))})
   )
   tps3 <- system.time(
     e3 <- tryCatch(evalWithTimeout(estimate(mR,d), timeout = time.out), silent = TRUE, 
-                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA, method = "nlminb2")))})
+                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA), control = list(method = "nlminb2")))})
   )
   tps4 <- system.time(
     e4 <- tryCatch(evalWithTimeout(estimate(mR,d, estimator = "gaussian2", control = list(method = "NR")), timeout = time.out), silent = TRUE, 
-                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA, method = "NR")))})
+                   error = function(cond){return(list(opt = list(convergence=1, iterations = NA), control = list(method = "NR")))})
   )
   if(is.null(e2$opt$convergence)){
     e2$opt$convergence <- if(e2$opt$iterations<lava.options()$iter.max){0}else{1}
@@ -69,7 +69,7 @@ for(iter.grid in 1:n.grid){
 ggTime <- ggplot(dt, aes(x = p, y = elapsed, group = method, color = method))
 ggTime <- ggTime + geom_point(aes(shape = cv), size = 2) + geom_line()
 ggTime <- ggTime + facet_wrap(~n)
-ggTime <- ggTime + geom_abline(intercept = 10, slope = 0, color = "black", linetype = 2)
+ggTime <- ggTime + geom_abline(intercept = time.out, slope = 0, color = "black", linetype = 2)
 ggTime
 ggsave(ggTime, file = "lava.reduce/inst/timing/plotTime.png")
 ggsave(ggTime, file = "lava.reduce/inst/timing/plotTime.svg")

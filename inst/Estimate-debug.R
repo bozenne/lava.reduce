@@ -2,6 +2,7 @@ categorical2dummy <- lava:::categorical2dummy
 Debug <- lava:::Debug
 procdata.lvm <- lava:::procdata.lvm
 glm.estimate.hook <- lava:::glm.estimate.hook
+index <- lava:::index
 
 gaussian_objective.lvm <- lava:::gaussian_objective.lvm
 gaussian_logLik.lvm <- lava:::gaussian_logLik.lvm

@@ -105,7 +105,7 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
     
     exo <- tapply(vec.exo, vec.endo, list)
     endo <- names(exo)
-    
+   
   }else{ # reduce the linear predictor of specific endogeneous variables
     if(is.null(endo)){endo <- lava::endogenous(x)}
     
@@ -116,7 +116,7 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
     M <- x$M[remaining.exo,endo, drop = FALSE]
     
     col.reg <- names(which(apply(M, 2, function(i){any(i==1)}))) # find endo having exo
-    exo <- lapply(col.reg, function(var){names(which(M[,var]==1))})
+    exo <- lapply(col.reg, function(var){rownames(M)[which(M[,var,drop = FALSE]==1)]})
     names(exo) <- col.reg
     
     if(is.null(names(exo))){
@@ -125,7 +125,6 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
     }else{
       endo <- names(exo)#vars(x)[index.reduce]
     }
-    
     
   }
   
@@ -146,7 +145,7 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
   }
   
   if(rm.exo){
-    indexClean <- which(rowSums(x$index$A[x$exogenous,]!=0)==0)
+    indexClean <- which(rowSums(x$index$A[x$exogenous,,drop = FALSE]!=0)==0)
     kill(x) <- x$exogenous[indexClean]
   }
   

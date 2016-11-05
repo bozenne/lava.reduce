@@ -40,19 +40,21 @@ test_that("Regression: moment reduce", {
   e <- estimate(m, d, estimator = "gaussian1")
   index <- match(coef(m.red),coef(m))
   
+  dLP <- d
+  dLP[,lp(m.red)] <- 0
   
-  g1 <- gaussian1LP_gradient.lvm(m.red, p = start[index], data = d, indiv = FALSE)
+  g1 <- gaussian1LP_gradient.lvm(m.red, p = start[index], data = dLP, indiv = FALSE)
   g2 <- lava:::gaussian1_gradient.lvm(x = m, data=d, p=start, S = e$S, n = e$data$n, mu = e$mu)
   expect_equal(unname(g1), g2[index])
   
-  gaussianLP_logLik.lvm <- lava.reduce:::gaussianLP_logLik.lvm
-  gaussianLP_gradient.lvm <- lava.reduce:::gaussianLP_gradient.lvm
-  gaussianLP_score.lvm <- lava.reduce:::gaussianLP_score.lvm
-  gaussianLP_hessian.lvm <- lava.reduce:::gaussianLP_hessian.lvm
-  gaussian1LP_hessian.lvm <- lava.reduce:::gaussian1LP_hessian.lvm
-  gaussian2LP_hessian.lvm <- lava.reduce:::gaussian2LP_hessian.lvm
-  
-  # checkMoment(m.red, e)
+  # gaussianLP_logLik.lvm <- lava.reduce:::gaussianLP_logLik.lvm
+  # gaussianLP_gradient.lvm <- lava.reduce:::gaussianLP_gradient.lvm
+  # gaussianLP_score.lvm <- lava.reduce:::gaussianLP_score.lvm
+  # gaussianLP_hessian.lvm <- lava.reduce:::gaussianLP_hessian.lvm
+  # gaussian1LP_hessian.lvm <- lava.reduce:::gaussian1LP_hessian.lvm
+  # gaussian2LP_hessian.lvm <- lava.reduce:::gaussian2LP_hessian.lvm
+  # 
+  # checkMoment(m.red, e) # the data must be converted to matrix + add LP
     
 })
 
@@ -219,7 +221,15 @@ LVM1.red <- estimate(m, data = d,
 # automatic switch to y3 as a reference
 
 
-#### bug to fix ####
+#### can reduce with only one variable
+m <- lvm()
+m <- regression(m,y='y1',x='x'%++%1:1)
+test_that("reduce only one variable", {
+  mR <- reduce(m)
+})
+
+
+####  to fix ####
 
 if(FALSE){
 set.seed(10)

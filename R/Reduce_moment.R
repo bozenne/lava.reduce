@@ -1,3 +1,11 @@
+# scoreMVN_mets <- function(Y, mu, dmu, S, dS){
+#   
+#   .Call("loglikMVN", yl = Y, yu = NULL, status = NULL, 
+#         mu = mu, dmu = dmu, s = S, 
+#         ds = dS, z = NULL, su = NULL, dsu = NULL, 
+#         threshold = NULL, dthreshold = NULL, score = TRUE, PACKAGE = "mets")
+#   
+# }
 
 #' @title Moments for a reduced lvm model
 #' @name momentLVMr
@@ -9,6 +17,7 @@
 #' @param n number of observations
 #' @param indiv should the individual contribution be returned? Else average over the observations
 #' @param type method used to compute the hessian
+#' @param implementation default is R. If set to cpp all the computation of the gradient is made in a C++ routine.
 #' @param ... additional arguments
 #' 
 #' @details this function assumes that the external parameters in p are at the end of the vector
@@ -29,11 +38,14 @@ gaussianLP_objective.lvm <- function(x, p, data, ...){
 #' @rdname momentLVMr
 #' @export
 gaussianLP_logLik.lvm <- function(object, p, data, ...)  {
- 
-   dataLP <- calcLP.lvm(object, p = p, data = data, 
-                       lp.x = lp(object, type = "x", format = "list"), 
-                       lp.link = lp(object, type = "link", format = "list"), 
-                       lp.name = lp(object, type = "name"))
+  
+  if(is.matrix(p)){p <- as.double(p)}
+  if(is.null(names(p))){names(p) <- coef(object)}
+  
+  dataLP <- calcLP(data, p = p, 
+                   lp.x = lp(object, type = "x", format = "list"), 
+                   lp.link = lp(object, type = "link", format = "list"), 
+                   lp.name = lp(object, type = "name"))
   
   ## from normal_objective.lvm
   y <- lava::index(object)$endogenous
@@ -70,54 +82,83 @@ gaussianLP_logLik.lvm <- function(object, p, data, ...)  {
 gaussianLP_gradient.lvm <- function(x, p, data, ...){
   
   val <- -gaussianLP_score.lvm(x, p = p, data = data, ...)
-  if (NROW(val)>1) {
+  if (!is.null(nrow(val))){
     val <- colSums(val)
   }
-  # val <- unname(val)
+  
   return(val)
 }
 
 #' @rdname momentLVMr
 #' @export
-gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, ...)  {
+gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, implementation = "R", ...)  {
   
-  if(is.matrix(p)){
-    p <- as.double(p)
-  }
+  
+  if(is.matrix(p)){p <- as.double(p)}
+  if(is.null(names(p))){names(p) <- coef(x)}
+  
+  #### extract information
   lp.endo <- lp(x, type = "endogeneous")
   lp.link <- lp(x, type = "link", format = "list")
   lp.x <- lp(x, type = "x", format = "list")
   
-  dataLP <- calcLP.lvm(x, p = p, data = data, 
-                       lp.x = lp.x, lp.link = lp.link, lp.name = lp(x, type = "name"))
-
-  ## from normal_gradient.lvm
-  M <- moments(x,p)
+  names.data <- colnames(data)
+  names.p <- names(p)
+ 
+  M <- moments(x,p) # lava:::moments.lvm
   D <- deriv.lvm(x,p=p) # [WARNING lava:::]
   
-  s <- mets::scoreMVN(y = as.matrix(dataLP[,lava::manifest(x)]),
-                      mu = M$xi%x%rep(1,NROW(dataLP)),
-                      S= M$C,
-                      dmu = D$dxi,
-                      dS = D$dS)
-  colnames(s) <- coef(x)#c(name.intercept,name.regression,name.covariance)
   
-  ## apply chain rule
-  n.lp <- length(x$lp)
-  
-  for(iterLP in 1:n.lp){ 
-    name.intercept <- lp.endo[iterLP]
+  if(implementation == "cpp"){
     
-    ## extract data
-    X <-  data[,lp.x[[iterLP]],drop = FALSE]
-    dlp <- X # - what about dB/db in presence of constrains
-    s[,lp.link[[iterLP]]] <- apply(dlp, 2, function(j){j*s[,name.intercept]})
+    score <- scoreLVM(data = as.matrix(data),
+                      p = p,
+                      mu = M$xi%x%rep(1,NROW(data)),
+                      S = M$C,
+                      dmu = D$dxi,
+                      dS = D$dS,
+                      scoreFun = mets::scoreMVN,#scoreMVN_mets,
+                      indexCoef = lapply(lp.link, function(link){match(link, names.p) - 1}),
+                      indexEndo = lapply(lp.x, function(link){match(link, names.data) - 1}),
+                      indexIntercept = match(lp.endo, names.p) - 1,
+                      indexLP = match(lp(x, type = "name"), names.data) - 1,
+                      indexManifest = match(lava::manifest(x), names.data) - 1,
+                      indiv = indiv
+    )
+    colnames(score) <- coef(x)
+    
+  }else{
+    
+    #### compute
+    dataLP <- calcLP(data, p = p,
+                     lp.x = lp.x, lp.link = lp.link, lp.name = lp(x, type = "name"))
+    
+    score <- mets::scoreMVN(y = dataLP[,lava::manifest(x),drop = FALSE],
+                            mu = M$xi%x%rep(1,NROW(dataLP)),
+                            S= M$C,
+                            dmu = D$dxi,
+                            dS = D$dS)
+    colnames(score) <- coef(x)#c(name.intercept,name.regression,name.covariance)
+   
+    
+    ## apply chain rule
+    n.lp <- length(x$lp)
+    
+    for(iterLP in 1:n.lp){ 
+      name.intercept <- lp.endo[iterLP]
+      
+      ## extract data
+      X <-  data[,lp.x[[iterLP]],drop = FALSE]
+      dlp <- X # - what about dB/db in presence of constrains
+      score[,lp.link[[iterLP]]] <- apply(dlp, 2, function(j){j*score[,name.intercept]})
+    }
+    
+    if(indiv == FALSE){
+      score <- rbind(apply(score,2,sum))
+    }
   }
   
-  if(indiv == FALSE){
-    s <- rbind(apply(s,2,sum))
-  }
-  return(s) 
+  return(score) 
 }
 
 #' @rdname momentLVMr
@@ -129,6 +170,7 @@ gaussianLP_hessian.lvm <- function(x, p, n, type,...) {
     S <- -gaussianLP_score.lvm(x,p=p,data=dots$data,indiv = TRUE)
     I <- t(S)%*%S
     attributes(I)$grad <- colSums(S)
+    
     return(I)
   }else if(type=="num"){
     myg <- function(p1){ -gaussianLP_score.lvm(x,p=p1,n=n,data=dots$data,indiv=FALSE) }
@@ -141,8 +183,8 @@ gaussianLP_hessian.lvm <- function(x, p, n, type,...) {
     lp.link <- lp(x, type = "link", format = "list")
     lp.x <- lp(x, type = "x", format = "list")
     
-    dataLP <- calcLP.lvm(x, p = p, data = dots$data, 
-                         lp.x = lp.x, lp.link = lp.link, lp.name = lp.name)
+    dataLP <- calcLP(dots$data,  p = p,
+                     lp.x = lp.x, lp.link = lp.link, lp.name = lp.name)
     
     ## direct
     I <- information(x=x, p=p, n=n, data = dataLP)
@@ -203,26 +245,20 @@ gaussian2LP_hessian.lvm <- function(x, type, ...){
 #' @param lp.x the name of the exogeneous variables involved in the LP
 #' @param lp.link list containing for each LP the name of the links
 #' @param lp.name list containing for each LP its name
-calcLP.lvm <- function(x, p, data,
-                       lp.x, lp.link, lp.name){
-
-  pext <- modelVar(x,p)$e # redefine p with names (only external parameters)
+calcLP <- function(data, p,
+                   lp.x, lp.link, lp.name){
+  
   n.lp <- length(lp.name)
   
   for(iterLP in 1:n.lp){
+    
     ## extract coefficients according to constrains
-    b <- pext[lp.link[[iterLP]]] # x$lp$y1$con
+    b <- p[lp.link[[iterLP]]] # x$lp$y1$con
     
     ## compute linear predictor for the reduce model
-    # form <- stats::as.formula(paste0("~0+",paste(lp.x,collapse = "+")))
-    # as.matrix(model.matrix(form, data))
-    # if(is.data.table(data)){
-    #   data[,lp.endo[[iterLP]] := as.matrix(.SD) %*% b, with = FALSE, .SDcols = lp.x[[iterLP]]] 
-    # }else{
-      X <- as.matrix(data[,lp.x[[iterLP]],drop = FALSE]) 
-      data[,lp.name[iterLP]] <- X %*% b
-    # }
- 
+    X <- data[,lp.x[[iterLP]],drop = FALSE]
+    data[,lp.name[iterLP]] <- as.matrix(X) %*% b
+    
   }
   return(data)
 }

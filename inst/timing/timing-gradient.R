@@ -19,12 +19,17 @@ for(iter_p in 1:n.p){
   
   # simul
   d <- sim(m,n)
-  
+  d[,lp(mR)] <- 0
   #### gradient
   e1 <- estimate(m,d)
+  start1 <- coef(e1)[coef(mR)]
+  start2 <- coef(e1)
   
-  ben <- rbenchmark::benchmark(gaussianLP_gradient.lvm(x = mR, data = d, p = coef(e1)),
-                               lava:::gaussian_gradient.lvm(x = e1$model, data = d, p = coef(e1), n = e1$data$n, mu = e1$mu, S = e1$S),  # default
+  # FUN <- function(){gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "cpp")}
+  # butils::profileCode(FUN)
+  ben <- rbenchmark::benchmark(gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "cpp"),
+                               gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "R"),
+                               lava:::gaussian_gradient.lvm(x = e1$model, data = d, p = start2, n = e1$data$n, mu = e1$mu, S = e1$S),  # default
                                replications = 10
   )
   
@@ -35,7 +40,7 @@ for(iter_p in 1:n.p){
   )
 }
 
-dt[, test := factor(test, labels = c("lava.reduce","lava"))]
+dt[, test := factor(test, labels = c("lava.reduceCpp","lava.reduceR","lava"))]
 
 
 gg <- ggplot(dt, aes(x = p, y = elapsed, color = test, group = test))

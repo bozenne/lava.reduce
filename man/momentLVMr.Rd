@@ -32,7 +32,7 @@ gaussianLP_logLik.lvm(object, p, data, ...)
 
 gaussianLP_gradient.lvm(x, p, data, ...)
 
-gaussianLP_score.lvm(x, p, data, indiv = FALSE, ...)
+gaussianLP_score.lvm(x, p, data, indiv = FALSE, implementation = "R", ...)
 
 gaussianLP_hessian.lvm(x, p, n, type, ...)
 
@@ -42,7 +42,7 @@ gaussian1LP_logLik.lvm(object, p, data, ...)
 
 gaussian1LP_objective.lvm(x, p, data, ...)
 
-gaussian1LP_score.lvm(x, p, data, indiv = FALSE, ...)
+gaussian1LP_score.lvm(x, p, data, indiv = FALSE, implementation = "R", ...)
 
 gaussian1LP_gradient.lvm(x, p, data, ...)
 
@@ -54,7 +54,7 @@ gaussian2LP_logLik.lvm(object, p, data, ...)
 
 gaussian2LP_objective.lvm(x, p, data, ...)
 
-gaussian2LP_score.lvm(x, p, data, indiv = FALSE, ...)
+gaussian2LP_score.lvm(x, p, data, indiv = FALSE, implementation = "R", ...)
 
 gaussian2LP_gradient.lvm(x, p, data, ...)
 
@@ -70,6 +70,8 @@ gaussian2LP_hessian.lvm(x, type, ...)
 \item{...}{additional arguments}
 
 \item{indiv}{should the individual contribution be returned? Else average over the observations}
+
+\item{implementation}{default is R. If set to cpp all the computation of the gradient is made in a C++ routine.}
 
 \item{n}{number of observations}
 

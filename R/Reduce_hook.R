@@ -35,7 +35,7 @@ lava.reduce.estimate.hook <- function(x,data,weight,weight2,estimator,...) {
     if(is.null(dots$optim$start)){ # intialisation of the parameters
       
       ## non LP
-      x0 <- cancelLP(x, restaure = TRUE, simplify = TRUE) # remove LP and external parameters
+      x0 <- kill(x, value = lp(x), restaure = TRUE, simplify = TRUE) # remove LP and external parameters
       startLVM <- initCoef(x0, data = data, optim = dots$optim)
       
       ## update

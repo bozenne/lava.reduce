@@ -5,7 +5,8 @@
 #include <iostream>
 #include <Rmath.h>
 // #include "mets.h" // example biglasso calls bigmemory
-//#include "mets/mvtdst.h"
+// #include "mets/mvtdst.h"
+
 
 using namespace Rcpp ;
 using namespace std ;
@@ -32,6 +33,13 @@ arma::mat scoreLVM(arma::mat data, const arma::vec& p,
   //// score
   arma::mat Y = data.cols(as<uvec>(indexManifest));
   arma::mat score = as<mat>(scoreFun(Y, mu, dmu, S, dS));
+  
+  // SEXP A = loglikMVN(Y, // yl
+  //                    NULL, // yu
+  //                    NULL, // status
+  //                    mu,dmu, S, dS, // 
+  //                    NULL, NULL, NULL, NULL, NULL, true); // z su dsu threshold dthreshold score
+                     
   
   //// chain rule
   arma::mat X;

@@ -13,14 +13,18 @@
 }
 
 
+cancel.lvm <- get("cancel.lvm", envir = asNamespace("lava"), inherits = FALSE)
+
 deriv.lvm <- get("deriv.lvm", envir = asNamespace("lava"), inherits = FALSE)
 
 estimate.lvm <- get("estimate.lvm", envir = asNamespace("lava"), inherits = FALSE)
 
+kill.lvm <- get("kill.lvm", envir = asNamespace("lava"), inherits = FALSE)
+
 `latent<-.lvm` <- get("latent<-.lvm", envir = asNamespace("lava"), inherits = FALSE)
   
 regression.lvm <- get("regression.lvm", envir = asNamespace("lava"), inherits = FALSE)
-  
+
 procdata.lvm <- get("procdata.lvm", envir = asNamespace("lava"), inherits = FALSE)
 
 

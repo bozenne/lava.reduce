@@ -90,14 +90,9 @@ lvm2reduce <- function(x){
 #' @rdname reduce
 #' @export
 reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
-  
-  if("lvm.reduced" %in% class(x) == FALSE){
-    x <- lvm2reduce(x)
-  }
-  
+
   #### define the links
   if(!is.null(link)){ # reduce specific links
-    
     if("formula" %in% class(link)){ link <- list(link) }
     ls.link <- lapply(link, initVar_link, repVar1 = TRUE)
     vec.endo <- unlist(lapply(ls.link, "[[", 1))
@@ -130,7 +125,6 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
   
   #### reduce
   n.endo <- length(endo)
-  
   for(iterR in 1:n.endo){
     name.endo <- endo[iterR]
     name.exo <- exo[[iterR]]
@@ -138,15 +132,19 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
     if(length(name.exo)>0){
       ## can be problematic as we don't know about "additive" or other possibly relevant arguments
       f <- stats::as.formula(paste(name.endo,"~",paste(name.exo, collapse = "+")))
+      
       cancel(x) <- f
       
-      x <- lava::regression(x, to = name.endo, from = name.exo, reduce = TRUE)
+      if("lvm.reduced" %in% class(x) == FALSE){
+        x <- lvm2reduce(x)
+      }
+      x <- regression(x, to = name.endo, from = name.exo, reduce = TRUE)
     }
   }
   
   if(rm.exo){
     indexClean <- which(rowSums(x$index$A[x$exogenous,,drop = FALSE]!=0)==0)
-    kill(x) <- x$exogenous[indexClean]
+    x <- kill(x, lp = FALSE, value = x$exogenous[indexClean])
   }
   
   return(x)

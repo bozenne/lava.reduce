@@ -88,14 +88,14 @@ m <- regression(m, x=c("eta",exo.name[[1]]), y=endo.name[[1]])
 m <- regression(m, x=c("eta",exo.name[[2]]), y=endo.name[[2]])
 m <- regression(m, x=c("eta",exo.name[[3]]), y=endo.name[[3]])
 latent(m) <- "eta"
-m <- reduce(m)
+mr <- reduce(m)
 
-lp.name <- lp(m)
+lp.name <- lp(mr)
 
 test_that("lp - reduce all model", {
   
-  expect_equal(sort(unname(lp(m, type = "x", lp = lp.name[1]))), sort(exo.name[[1]]))
-  expect_equal(sort(unname(lp(m, type = "x", lp = lp.name[2]))), sort(exo.name[[2]]))
-  expect_equal(sort(unname(lp(m, type = "x", lp = lp.name[3]))), sort(exo.name[[3]]))
+  expect_equal(sort(unname(lp(mr, type = "x", lp = lp.name[1]))), sort(exo.name[[1]]))
+  expect_equal(sort(unname(lp(mr, type = "x", lp = lp.name[2]))), sort(exo.name[[2]]))
+  expect_equal(sort(unname(lp(mr, type = "x", lp = lp.name[3]))), sort(exo.name[[3]]))
   
 })

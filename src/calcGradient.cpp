@@ -1,8 +1,10 @@
+//// NOTE: http://thread.gmane.org/gmane.comp.lang.r.rcpp/4457
+
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <Rmath.h>
-#include "mets.h" // example biglasso calls bigmemory
+// #include "mets.h" // example biglasso calls bigmemory
 //#include "mets/mvtdst.h"
 
 using namespace Rcpp ;
@@ -36,7 +38,7 @@ arma::mat scoreLVM(arma::mat data, const arma::vec& p,
   
   for(unsigned iterLP=0 ; iterLP < n_lp ; iterLP++){
     n_endo = indexEndo[iterLP].size();
-    for(unsigned iterEndo=0 ; iterEndo < n_endo ; iterEndo++){  
+    for(unsigned iterEndo=0 ; iterEndo < n_endo ; iterEndo++){
       score.col(indexCoef[iterLP][iterEndo]) = data.col(indexEndo[iterLP][iterEndo]) % score.col(indexIntercept[iterLP]);
       // score = X %*% score(intercept) where %*% is the Schur product, i.e. element wise
     }
@@ -47,7 +49,6 @@ arma::mat scoreLVM(arma::mat data, const arma::vec& p,
   }
   
   return(score);
-  
 }
 
 // other functions
@@ -55,15 +56,15 @@ arma::mat scoreLVM(arma::mat data, const arma::vec& p,
 void calcLP(arma::mat& data, const arma::vec& p, unsigned n_lp,
             const std::vector<IntegerVector >& indexCoef, const std::vector<IntegerVector >& indexEndo, const IntegerVector& indexLP){
   
-  colvec coef;
+  arma::colvec coef, LP;
   arma::mat X;
-  
+
   for(unsigned iterLP=0 ; iterLP < n_lp ; iterLP++){
-    
+
     coef = p.elem(as<uvec>(indexCoef[iterLP]));
     X = data.cols(as<uvec>(indexEndo[iterLP]));
     data.col(indexLP[iterLP]) = X * coef;
-    
+
   }
   
 }

@@ -6,6 +6,7 @@
 #' @importFrom mets loglikMVN scoreMVN
 #' @importFrom numDeriv jacobian
 #' @importFrom stats as.formula coef delete.response predict setNames terms
+#' @useDynLib lava.reduce
 NULL
 
 

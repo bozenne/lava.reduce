@@ -117,7 +117,6 @@ gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, implementation = "R"
                       S = M$C,
                       dmu = D$dxi,
                       dS = D$dS,
-                      scoreFun = mets::scoreMVN,#scoreMVN_mets,
                       indexCoef = lapply(lp.link, function(link){match(link, names.p) - 1}),
                       indexEndo = lapply(lp.x, function(link){match(link, names.data) - 1}),
                       indexIntercept = match(lp.endo, names.p) - 1,
@@ -179,6 +178,9 @@ gaussianLP_hessian.lvm <- function(x, p, n, type,...) {
     return( I )
   }else if(type == "information"){ ## true part
     
+    browser()
+    S <- -gaussianLP_score.lvm(x,p=p,data=dots$data,indiv = FALSE)
+    
     lp.name <- lp(x, type = "name")
     lp.link <- lp(x, type = "link", format = "list")
     lp.x <- lp(x, type = "x", format = "list")
@@ -235,8 +237,6 @@ gaussian2LP_gradient.lvm <- gaussianLP_gradient.lvm
 gaussian2LP_hessian.lvm <- function(x, type, ...){
   gaussianLP_hessian.lvm(x, type = "E", ...)
 }
-
-
 
 #' @title Compute the linear predictor
 #' @description Compute the value of the linear predictors of a LVM and store it into the dataset

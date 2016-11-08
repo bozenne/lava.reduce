@@ -48,8 +48,8 @@ lava.reduce.estimate.hook <- function(x,data,weight,weight2,estimator,...) {
     if(estimator == "gaussian"){
       estimator <- paste0("gaussian", lava.options()$estimator.default.reduce)
     }
-    
-    validEstimator <- paste0("gaussian",c("",1,2))
+   
+    validEstimator <- paste0("gaussian",c("",1:3))
     if(estimator %in% validEstimator){
       estimator <- paste0(estimator,"LP")
     } else {

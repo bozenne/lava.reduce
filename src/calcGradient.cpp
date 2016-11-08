@@ -1,12 +1,8 @@
-//// NOTE: http://thread.gmane.org/gmane.comp.lang.r.rcpp/4457
-
-// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppArmadillo, mets)]]
 #include <RcppArmadillo.h>
 #include <iostream>
 #include <Rmath.h>
-// #include "mets.h" // example biglasso calls bigmemory
-// #include "mets/mvtdst.h"
-
+#include <mets.h> 
 
 using namespace Rcpp ;
 using namespace std ;
@@ -19,7 +15,7 @@ void calcLP(arma::mat& data, const arma::vec& p, unsigned n_lp,
 
 // [[Rcpp::export]]
 arma::mat scoreLVM(arma::mat data, const arma::vec& p, 
-                   Function scoreFun, const arma::mat& mu, const arma::mat& dmu, const arma::mat& S, const arma::mat& dS,
+                   const arma::mat& mu, const SEXP& dmu, const arma::mat& S, const SEXP& dS,
                    const std::vector<IntegerVector >& indexCoef, const std::vector<IntegerVector >& indexEndo,
                    const IntegerVector& indexIntercept,
                    const IntegerVector& indexLP, const IntegerVector& indexManifest,
@@ -32,14 +28,11 @@ arma::mat scoreLVM(arma::mat data, const arma::vec& p,
   
   //// score
   arma::mat Y = data.cols(as<uvec>(indexManifest));
-  arma::mat score = as<mat>(scoreFun(Y, mu, dmu, S, dS));
-  
-  // SEXP A = loglikMVN(Y, // yl
-  //                    NULL, // yu
-  //                    NULL, // status
-  //                    mu,dmu, S, dS, // 
-  //                    NULL, NULL, NULL, NULL, NULL, true); // z su dsu threshold dthreshold score
-                     
+  arma::mat score = mets::_loglikMVN(Y, // yl
+                                     R_NilValue, // yu
+                                     R_NilValue, // status
+                                     mu, dmu, S, dS, //
+                                     R_NilValue, R_NilValue, R_NilValue, R_NilValue, R_NilValue, true); // z su dsu threshold dthreshold score
   
   //// chain rule
   arma::mat X;
@@ -66,14 +59,16 @@ void calcLP(arma::mat& data, const arma::vec& p, unsigned n_lp,
   
   arma::colvec coef, LP;
   arma::mat X;
-
+  
   for(unsigned iterLP=0 ; iterLP < n_lp ; iterLP++){
-
+    
     coef = p.elem(as<uvec>(indexCoef[iterLP]));
     X = data.cols(as<uvec>(indexEndo[iterLP]));
     data.col(indexLP[iterLP]) = X * coef;
-
+    
   }
   
 }
+
+
 

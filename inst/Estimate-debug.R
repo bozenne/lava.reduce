@@ -33,6 +33,7 @@ estimate.lvm <- function (x, data = parent.frame(), estimator = "gaussian", cont
     x <- catx$x
     data <- catx$data
   }
+  
   cl <- match.call()
   if (!base::missing(param)) {
     oldparam <- lava.options()$param
@@ -107,6 +108,7 @@ estimate.lvm <- function (x, data = parent.frame(), estimator = "gaussian", cont
   else {
     id <- NULL
   }
+  
   Debug("procdata")
   dd <- procdata.lvm(x, data = data)
   S <- dd$S
@@ -120,6 +122,7 @@ estimate.lvm <- function (x, data = parent.frame(), estimator = "gaussian", cont
         x <- latent(x, new.lat)
     }
   }
+  
   myhooks <- gethook()
   for (f in myhooks) {
     res <- do.call(f, list(x = x, data = data, weight = weight, 
@@ -148,6 +151,7 @@ estimate.lvm <- function (x, data = parent.frame(), estimator = "gaussian", cont
       estimator <- toupper(estimator)
     }
   }
+  
   ObjectiveFun <- paste0(estimator, "_objective", ".lvm")
   GradFun <- paste0(estimator, "_gradient", ".lvm")
   if (!exists(ObjectiveFun) & !exists(GradFun)) 
@@ -165,6 +169,7 @@ estimate.lvm <- function (x, data = parent.frame(), estimator = "gaussian", cont
       "nlminb1"
     else Method
   }
+  
   if (!quick & index) {
     x <- fixsome(x, measurement.fix = fix, S = S, mu = mu, 
                  n = n, debug = !silent)
@@ -179,6 +184,7 @@ estimate.lvm <- function (x, data = parent.frame(), estimator = "gaussian", cont
                      deriv = TRUE, mean = TRUE)
     }
   }
+  
   if (is.null(estimator) || estimator == FALSE) {
     return(x)
   }

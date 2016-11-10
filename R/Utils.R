@@ -31,9 +31,9 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
   }
   
   if(class(var1) == "formula"){
-    var2 <- all.vars(stats::delete.response(stats::terms(var1)))
+    var2 <- select.regressor(var1, type = "vars")
     n.var2 <- length(var2)
-    var1 <- setdiff(all.vars(var1),var2)
+    var1 <- select.response(var1, type = "vars")
   }
   
   #### convert to format
@@ -55,7 +55,7 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
     )
   }
  
-  #### export ####
+  ## export 
   return(res)
 }
 
@@ -63,19 +63,131 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
 
 #' @title Response variable of a formula
 #' @description Return the reponse variable contained in the formula
+#' @name select.response
 #' 
-#' @param formula a formula
+#' @param x a formula
+#' @param type either return an object of type call (\code{"call"}) or the names of the variables (\code{"vars"})
+#' @param ... additional arguments to be passed to the low level functions
 #' 
 #' @examples 
 #' select.response(Y1~X1+X2)
+#' select.response(Y1~X1+X2, type = "vars")
+#' 
+#' select.response(Y1~X1+Y1)
+#' select.response(Y1+Y2~X1+Y1, type = "vars")
+#' 
+#' select.response(~X1+X2)
+#' select.response(~X1+X2, type = "vars")
+
+#' @rdname select.response
+#' @export
+`select.response` <-  function(x,...) UseMethod("select.response")
+
+#' @rdname select.response
+#' @export
+select.response.formula <- function(x, type = "call", ...){
+  
+  match.arg(type, c("call","vars"))
+  
+  if(length(x)==3){
+    res <- x[[2]]
+    if(type == "vars"){
+      res <- all.vars(res)
+    }
+  }else{
+    res <- NULL
+  }
+  
+  return(res)
+}
+
+#' @title Regressor of a formula
+#' @description Return the regressor variables contained in the formula
+#' @name select.regressor
+#' 
+#' @param x a formula
+#' @param type either return an object of type call (\code{"call"}) or the names of the variables (\code{"vars"})
+#' @param ... additional arguments to be passed to the low level functions
+#'   
+#' @examples 
+#' select.regressor(Y1~X1+X2)
+#' select.regressor(Y1~X1+X2, type = "vars")
+#' 
+#' select.regressor(Y1~X1+Y1)
+#' select.regressor(Y1+Y2~X1+Y1, type = "vars")
+#' 
+#' select.regressor(~X1+X2)
+#' select.regressor(~X1+X2, type = "vars")
+
+
+#' @rdname select.regressor
+#' @export
+`select.regressor` <-  function(x,...) UseMethod("select.regressor")
+
+#' @rdname select.regressor
+#' @export
+select.regressor.formula <- function(x, type = "call", ...){
+  
+  match.arg(type, c("call","vars"))
+  
+  if(length(x)==3){
+    res <- x[[3]]
+    
+  }else if(length(x)==2){
+    res <- x[[2]]
+  }else{
+    res <- NULL
+  }
+  if(type == "vars"){
+    res <- all.vars(res)
+  }
+  
+  return(res)
+}
+
+#' @title Combine formula
+#' @description Combine formula by outcome
+#' 
+#' @param ls.formula a list of formula
+#' @param as.formula should as.formula be applied to each element of the list
+#' @param as.unique should regressors appears at most once in the formula
+#' 
+#' @examples
+#' combine.formula(list(Y~X1,Y~X3+X5,Y1~X2))
+#' lava.options(symbol = c("~",","))
+#' combine.formula(list("Y~X1","Y~X3+X5","Y1~X2"))
+#' lava.options(symbol = c("<-","<->"))
+#' combine.formula(list("Y<-X1","Y<-X3+X5","Y1<-X2"))
+#' 
+#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2))
+#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2), as.unique = TRUE)
 #' 
 #' @export
-select.response <- function(formula){
-  return(
-    setdiff(all.vars(formula),
-            all.vars(delete.response(terms(formula))))
-  )
+combine.formula <- function(ls.formula, as.formula = TRUE, as.unique = FALSE){
+  
+  if(length(ls.formula)==0){return(NULL)}
+  if(class(ls.formula)=="formula"){ls.formula <- list(ls.formula)}
+  
+  ls.Vars <- lapply(ls.formula, initVar_link)
+  
+  ls.endogeneous <- unlist(lapply(ls.Vars, "[[", 1))
+  ls.X <- lapply(ls.Vars, "[[", 2)
+  endogenous <- unique(ls.endogeneous)
+  n.endogeneous <- length(endogenous)
+  
+  ls.formula2 <- vector(n.endogeneous, mode = "list")
+  for(iterE in 1:n.endogeneous){
+    X <- unlist(ls.X[which(ls.endogeneous==endogenous[iterE])])
+    if(as.unique){X <- unique(X)}
+    txt <- paste(endogenous[iterE],"~",paste(X, collapse = " + "))
+    ls.formula2[[iterE]] <- as.formula(txt)
+  }
+  
+  return(ls.formula2)
 }
+
+
+#### NOT USED ####
 
 #' @title formula character conversion
 #' @description Conversion of formula into character string or vice versa
@@ -122,44 +234,84 @@ character2formula <- function(txt){
   
 }
 
-#' @title Combine formula
-#' @description Combine formula by outcome
+#' @title Find methods belonging to other classes
+#' @description Find methods that apply to the object for each class of the object
 #' 
-#' @param ls.formula a list of formula
-#' @param as.formula should as.formula be applied to each element of the list
-#' @param as.unique should regressors appears at most once in the formula
+#' @param object an object
+#' @param FUN the name of a generic method
+#' @param class the level of class
+#' @param export should all methods be output (\code{"all"}) or only the first one (\code{"first"})
+#' @param value should the method be returned. Else its name will be returned.
 #' 
 #' @examples
-#' combine.formula(list(Y~X1,Y~X3+X5,Y1~X2))
-#' lava.options(symbol = c("~",","))
-#' combine.formula(list("Y~X1","Y~X3+X5","Y1~X2"))
-#' lava.options(symbol = c("<-","<->"))
-#' combine.formula(list("Y<-X1","Y<-X3+X5","Y1<-X2"))
-#' 
-#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2))
-#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2), as.unique = TRUE)
+#' m <- lvm.reduced(Y~X)
+#' getS3methodParent(m, "coef")
+#' getS3methodParent(m, "coef", value = TRUE)
 #' 
 #' @export
-combine.formula <- function(ls.formula, as.formula = TRUE, as.unique = FALSE){
+getS3methodParent <- function(object, FUN, class = 1, export = "all", value = FALSE){
   
-  if(length(ls.formula)==0){return(NULL)}
-  if(class(ls.formula)=="formula"){ls.formula <- list(ls.formula)}
+  match.arg(export, c("first","all"))
   
-  ls.Vars <- lapply(ls.formula, initVar_link)
-  
-  ls.endogeneous <- unlist(lapply(ls.Vars, "[[", 1))
-  ls.X <- lapply(ls.Vars, "[[", 2)
-  endogenous <- unique(ls.endogeneous)
-  n.endogeneous <- length(endogenous)
-  
-  ls.formula2 <- vector(n.endogeneous, mode = "list")
-  for(iterE in 1:n.endogeneous){
-    X <- unlist(ls.X[which(ls.endogeneous==endogenous[iterE])])
-    if(as.unique){X <- unique(X)}
-    txt <- paste(endogenous[iterE],"~",paste(X, collapse = " + "))
-    ls.formula2[[iterE]] <- as.formula(txt)
-  }
-  
-  return(ls.formula2)
+   object.class <- class(object)
+   n.class <- length(object.class)
+   if(n.class == 0){
+     stop("\'object\' inherit from no class \n")
+   }
+   
+   
+   if(is.character(class)){
+     if(class %in% object.class == FALSE){
+       stop("\'object\' does not inherit of  class ",class," \n")
+     }else{
+       class <- object.class[-(1:which(object.class == class))]
+     }
+   }else{
+     if(class %in% 0:(n.class-1) == FALSE){
+       stop("\'object\' inherit from ",n.class," class(es)\n",
+            "\'class\' cannot be ",class,"\n")
+     }else{
+       class <- object.class[-(1:class)]
+     }
+   }
+   ls.method <- sapply(class, function(c){getS3method(f = FUN, class = c, optional = TRUE)})
+   test <- unlist(lapply(ls.method, length))
+   if(all(test == 0)){
+     return(NULL)
+   }else if(any(test == 0)){
+     ls.method[test == 0] <- NULL
+   }
+   
+   if(value == FALSE){
+     available.method <- paste(FUN, class[test>0], sep = ".")
+     if(export == "first"){
+       return(available.method[1])
+     }else if(export == "all"){
+       return(available.method)
+     }
+   }else if(export == "first"){
+     return(ls.method[[1]])
+   }else if(export == "all"){
+     return(ls.method)
+   }
 }
 
+#' @title Call the first method inhereted by the object
+#' @description Call the first method inhereted by the object
+#' 
+#' @param object an object
+#' @param FUN the name of a generic method
+#' @param class the level of class
+#' @param ... additional arguments to be passed to the method that will be called
+#' 
+#' @examples
+#' m <- lvm.reduced(Y~X)
+#' callS3methodParent(m, "coef")
+#' callS3methodParent(m, FUN = "coef", class = "lvm.reduced")
+#' 
+#' @export
+callS3methodParent <- function(object, FUN, class = 1,...){
+  
+  return(getS3methodParent(object, FUN = FUN, class = class, export = "first", value = TRUE)(object, ...))
+  
+}

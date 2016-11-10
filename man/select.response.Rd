@@ -2,18 +2,31 @@
 % Please edit documentation in R/Utils.R
 \name{select.response}
 \alias{select.response}
+\alias{select.response.formula}
 \title{Response variable of a formula}
 \usage{
-select.response(formula)
+select.response(x, ...)
+
+\method{select.response}{formula}(x, type = "call")
 }
 \arguments{
-\item{formula}{a formula}
+\item{x}{a formula}
+
+\item{...}{additional arguments to be passed to the low level functions}
+
+\item{type}{either return an object of type call (\code{"call"}) or the names of the variables (\code{"vars"})}
 }
 \description{
 Return the reponse variable contained in the formula
 }
 \examples{
 select.response(Y1~X1+X2)
+select.response(Y1~X1+X2, type = "vars")
 
+select.response(Y1~X1+Y1)
+select.response(Y1+Y2~X1+Y1, type = "vars")
+
+select.response(~X1+X2)
+select.response(~X1+X2, type = "vars")
 }
 

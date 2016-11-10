@@ -88,9 +88,9 @@ regression.lvm.reduced <- function(object = lvm(), to, from, y, x, reduce = FALS
     lava::parameter(object) <- setdiff(allCoef,coef(object))
     return(object)
     
-  }else {
+  } else {
     
-    return(regression.lvm(object = object, to = to, from = from, y = y, x = x, ...)) # [WARNING lava:::]
+    return(callS3methodParent(object, FUN = "regression", class = "lvm.reduced", to = to, from = from, y = y, x = x, ...))
     
   }
   

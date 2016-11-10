@@ -46,13 +46,7 @@ test_that("Regression: moment reduce", {
   g1 <- gaussian1LP_gradient.lvm(m.red, p = start[index], data = dLP, indiv = FALSE)
   g2 <- lava:::gaussian1_gradient.lvm(x = m, data=d, p=start, S = e$S, n = e$data$n, mu = e$mu)
   expect_equal(unname(g1), g2[index])
-  
-  # g1 <- gaussian3LP_hessian.lvm(m.red, p = start[index], data = dLP, indiv = FALSE)
-  # g2 <- lava:::gaussian_hessian.lvm(x = m, data=d, p=start, S = e$S, n = e$data$n, mu = e$mu)
-  # g2 <- information.lvm(x = m, data=d, p=start, S = e$S, n = e$data$n, mu = e$mu)
-  # expect_equal(unname(g1), g2[index])
-  
-  
+
   # gaussianLP_logLik.lvm <- lava.reduce:::gaussianLP_logLik.lvm
   # gaussianLP_gradient.lvm <- lava.reduce:::gaussianLP_gradient.lvm
   # gaussianLP_score.lvm <- lava.reduce:::gaussianLP_score.lvm

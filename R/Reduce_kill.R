@@ -23,7 +23,7 @@ kill.lvm.reduced  <- function(x, value = NULL, lp = TRUE, expar = TRUE, restaure
   allVar <- unlist(lapply(value, function(f){unlist(initVar_link(f))}))
   
   if(is.null(lp(x))){
-    return(kill.lvm(x, value = value, ...))
+    return(callS3methodParent(x, FUN = "kill", class = "lvm.reduced", value = value, ...))
   }
   
   if(any(allVar %in% lp(x))){
@@ -47,7 +47,7 @@ kill.lvm.reduced  <- function(x, value = NULL, lp = TRUE, expar = TRUE, restaure
   if(any(allVar %in% vars(x, lp = FALSE, xlp = FALSE))){ ## standard
     var.rm <- allVar[allVar %in% vars(x, lp = FALSE, xlp = FALSE)]
     
-    x <- kill.lvm(x, value = var.rm, ...)
+    x <- callS3methodParent(x, FUN = "kill", class = "lvm.reduced", value = var.rm, ...)
     
   }
   
@@ -79,14 +79,15 @@ cancel.lvm.reduced  <- function(x, value = NULL, expar = TRUE, restaure = FALSE,
     
     for(iterF in 1:length(allCoef.nlp)){
       
-      x <- cancel.lvm(x, value = unlist(initVar_link(allCoef.nlp[[iterF]])))
+      x <- callS3methodParent(x, FUN = "cancel", class = "lvm.reduced", 
+	                          value = unlist(initVar_link(allCoef.nlp[[iterF]])))
+							  
     }
   }
   
   ## coefficients in LP
   if(length(allCoef.lp)>0){
-    
-    vecLP.response <- sapply(allCoef.lp, function(link){select.response(character2formula(link))})
+    vecLP.response <- sapply(allCoef.lp, function(txt){initVar_link(txt)$var1})
     value <- tapply(allCoef.lp, vecLP.response, list)
     
     names.lp <- lp(x, type = "name")[match(unique(vecLP.response), lp(x, type = "endo"))]
@@ -130,7 +131,7 @@ cancel.lvm.reduced  <- function(x, value = NULL, expar = TRUE, restaure = FALSE,
   n.link <- lp(x, type = "n.link")
   if(any(n.link==0)){
     name.lp <- names(n.link)[which(n.link==0)]
-    x <- kill.lvm(x, name.lp)
+    x <- callS3methodParent(x, FUN = "kill", class = "lvm.reduced", value = name.lp)
     x$lp[lp(x, lp = name.lp, type = "endo")] <- NULL
   }
   

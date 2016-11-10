@@ -106,7 +106,7 @@ gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, implementation = "R"
   names.p <- names(p)
  
   M <- moments(x,p) # lava:::moments.lvm
-  D <- deriv.lvm(x,p=p) # [WARNING lava:::]
+  D <- callS3methodParent(x, FUN = "deriv", class = "lvm.reduced",p=p)
   
   
   if(implementation == "cpp"){

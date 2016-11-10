@@ -16,7 +16,7 @@
 initCoef <- function(x, data, optim, ...){
   
   ## compute moment
-  dd <- procdata.lvm(x, data = data)
+  dd <- procdata.lvm(x, data = data) # callS3methodParent(x, FUN = "procdata", class = "lvm.reduced", data = data)
   S <- dd$S
   mu <- dd$mu
   n <- dd$n

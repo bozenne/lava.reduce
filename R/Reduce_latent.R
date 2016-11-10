@@ -8,7 +8,7 @@
 #' @export
 `latent<-.lvm.reduced` <- function(x, ..., value){
  
-  x <- `latent<-.lvm`(x, value = value, ...) # [WARNING lava:::]
+  x <- callS3methodParent(x, FUN = "latent<-", class = "lvm.reduced", value = value, ...)
   
   if(!is.null(lava::latent(x))){
     

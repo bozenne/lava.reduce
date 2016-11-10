@@ -17,6 +17,5 @@ estimate.lvm.reduced <- function(x, data, ...){
                 matrix(0,nrow = NROW(data), ncol = length(name.LP), dimnames = list(NULL,name.LP))
   )
   
-  # return(estimate.lvm(x, data=data, ...))
-  return(estimate.lvm(x, data=data, ...)) # [WARNING lava:::]
+  return(callS3methodParent(x, FUN = "estimate", class = "lvm.reduced", data=data, ...))
 }

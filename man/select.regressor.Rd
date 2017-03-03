@@ -7,7 +7,7 @@
 \usage{
 select.regressor(x, ...)
 
-\method{select.regressor}{formula}(x, type = "call")
+\method{select.regressor}{formula}(x, type = "call", ...)
 }
 \arguments{
 \item{x}{a formula}

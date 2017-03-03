@@ -63,13 +63,13 @@ regression.lvm.reduced <- function(object = lvm(), to, from, y, x, reduce = FALS
       stop("cannot integrate endogenous variables in the linear predictor \n",
            "endogenous: \"",paste(from[from %in% lava::endogenous(object)], collapse = "\" \""),"\" \n")
     }
-    
+
     allCoef <- coef(lava::regression(object, to = to, from = from, reduce = FALSE, ...))
     if(!identical(reduce,TRUE) && length(reduce)!=length(to)){
       stop("wrong specification of argument \'reduce\' \n",
            "must be TRUE or a character vector of size ",length(to),"\n")
     }
-    
+
     if("lp" %in% names(object) == FALSE){object$lp <- list()}
     for(iterR in to){ ### I don't know where to get the constrains
       name.LP <- if(reduce==TRUE){paste0("LP",iterR)}else{reduce}

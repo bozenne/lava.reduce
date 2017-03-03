@@ -9,19 +9,17 @@
 #' @details See test file test/testthat/test-Reduce.R for examples
 #' @export
 initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
-  
-  Slink <- c(lava.options()$symbol[1],lava.options()$symbols[1])
-  pSlink <- paste(c(Slink,"~"), collapse = "|")
-  Scov <- c(lava.options()$symbol[2],lava.options()$symbols[2])
-  pScov <- paste(Scov, collapse = "|")
-
+  Slink <- lava.options()$symbols[1]
+  # pSlink <- paste(c(Slink,"~"), collapse = "|")
+  Scov <- lava.options()$symbols[2]
+ 
   if(missing(var2) && is.character(var1)){ 
-    if(grepl(pScov,var1)==TRUE){ ## covariance
+    if(grepl(Scov,var1)==TRUE){ ## covariance
       Scov <- names(unlist(sapply(Scov, grep, x = var1)))[1]
       var1 <- gsub(Scov,"~", x = var1)
       sep <- Scov
     }
-    if(grepl(pSlink,var1)==TRUE){ # regression
+    if(grepl(Slink,var1)==TRUE){ # regression
       Slink <- names(unlist(sapply(c(Slink,"~"), grep, x = var1)))[1]
       var1 <- stats::as.formula(gsub(Slink,"~",var1))
       sep <- if(format == "formula"){"~"}else{Slink}
@@ -154,9 +152,9 @@ select.regressor.formula <- function(x, type = "call", ...){
 #' 
 #' @examples
 #' combine.formula(list(Y~X1,Y~X3+X5,Y1~X2))
-#' lava.options(symbol = c("~",","))
+#' lava.options(symbols = c("~",","))
 #' combine.formula(list("Y~X1","Y~X3+X5","Y1~X2"))
-#' lava.options(symbol = c("<-","<->"))
+#' lava.options(symbols = c("<-","<->"))
 #' combine.formula(list("Y<-X1","Y<-X3+X5","Y1<-X2"))
 #' 
 #' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2))
@@ -199,7 +197,6 @@ combine.formula <- function(ls.formula, as.formula = TRUE, as.unique = FALSE){
 #' 
 #' @examples
 #' formula2character(Y1~X1+X2)
-#' formula2character(Y1~X1+X2, type = "symbol")
 #' formula2character(Y1~X1+X2, type = "symbols")
 #' 
 #' character2formula("Y1~X1+X2")
@@ -211,7 +208,7 @@ combine.formula <- function(ls.formula, as.formula = TRUE, as.unique = FALSE){
 #' @export
 formula2character <- function(f, type = "formula"){
   
-  match.arg(type, choices = c("formula", "symbols", "symbol"))
+  match.arg(type, choices = c("formula", "symbols"))
   
   if(type == "formula"){
     txt <- paste(deparse(f), collapse = "+")

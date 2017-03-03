@@ -7,7 +7,7 @@
 \usage{
 select.response(x, ...)
 
-\method{select.response}{formula}(x, type = "call")
+\method{select.response}{formula}(x, type = "call", ...)
 }
 \arguments{
 \item{x}{a formula}

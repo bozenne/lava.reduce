@@ -1,4 +1,4 @@
-# library(testthat)
+library(testthat)
 # library(lava.reduce)
 # library(lava)
 
@@ -16,7 +16,7 @@ test_that("initVar - two different variables",{
   expect_equal(l, initVar_link(var1 = a ~ b))
   expect_equal(list(f),initVar_link(var1 = "a ~ b", format = "formula"))
   # covariance
-  expect_equal(l, initVar_link(var1 = "a,b"))
+  expect_equal(l, initVar_link(var1 = "a~~b"))
   # var
   expect_equal(l, initVar_link(var1 = "a", var2 = "b"))
 })
@@ -26,7 +26,7 @@ test_that("initVar - one repeated variable",{
   l <- list(var1 = "X1", var2 = "X1")
   # regression
   expect_equal(l, initVar_link(var1 = X1~X1))
-  expect_equal(l, initVar_link(var1 = "X1,X1"))
+  expect_equal(l, initVar_link(var1 = "X1~~X1"))
 })
 
 test_that("initVar - no response variable",{

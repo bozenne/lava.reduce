@@ -22,7 +22,6 @@ Conversion of formula into character string or vice versa
 }
 \examples{
 formula2character(Y1~X1+X2)
-formula2character(Y1~X1+X2, type = "symbol")
 formula2character(Y1~X1+X2, type = "symbols")
 
 character2formula("Y1~X1+X2")

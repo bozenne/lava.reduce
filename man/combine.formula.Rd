@@ -18,9 +18,9 @@ Combine formula by outcome
 }
 \examples{
 combine.formula(list(Y~X1,Y~X3+X5,Y1~X2))
-lava.options(symbol = c("~",","))
+lava.options(symbols = c("~",","))
 combine.formula(list("Y~X1","Y~X3+X5","Y1~X2"))
-lava.options(symbol = c("<-","<->"))
+lava.options(symbols = c("<-","<->"))
 combine.formula(list("Y<-X1","Y<-X3+X5","Y1<-X2"))
 
 combine.formula(list(Y~X1,Y~X3+X1,Y1~X2))

@@ -19,6 +19,8 @@ set.seed(10)
 df.data <- sim(m, 1e2)
 #+END_SRC
 
+#+RESULTS:
+
 Since the number of covariate can be large, we would like to consider only the linear predictor for each outcome:
 #+BEGIN_SRC R :exports both :results output
   mr <- reduce(m)
@@ -31,6 +33,9 @@ Then we can estimate the model:
   e.mr <- estimate(mr, data = df.data, control = list(constrain = TRUE))
   coef(e.mr)
 #+END_SRC
+
+#+RESULTS:
+[[file:inst/lava1.png]]
 
 
 and check that the estimates match with the one of the standard =lvm=

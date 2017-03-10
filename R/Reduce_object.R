@@ -63,7 +63,7 @@ lvm2reduce <- function(x){
 #' @param x \code{lvm}-object
 #' @param link the links that should be aggregated into linear predictors
 #' @param endo the endogeneous variables for which the related exogeneous variables should be aggregated
-#' @param rm.exo should the exogeneous variables be remove from the object
+#' @param clean should the lvm object be simplified using the \code{clean} function
 #' @param ... additional arguments to be passed to the low level functions
 #' 
 #' @examples 
@@ -106,7 +106,7 @@ lvm2reduce <- function(x){
 # {{{ reduce.lvm 
 #' @rdname reduce
 #' @export
-reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
+reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
 
   if(is.null(link)){ # reduce the linear predictor of specific endogeneous variables
   
@@ -149,9 +149,8 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
         regression(x, reduce = TRUE) <- ls.link[[iterR]]
 
     }
-    if(rm.exo){
-        indexClean <- which(rowSums(x$index$A[x$exogenous,,drop = FALSE]!=0)==0)
-        x <- kill(x, lp = FALSE, value = x$exogenous[indexClean])
+    if(clean){
+        x <- clean(x, ...)
     }
   
   return(x)

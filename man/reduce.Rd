@@ -7,7 +7,7 @@
 \usage{
 reduce(x, ...)
 
-\method{reduce}{lvm}(x, link = NULL, endo = NULL, rm.exo = TRUE, ...)
+\method{reduce}{lvm}(x, link = NULL, endo = NULL, clean = TRUE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}
@@ -18,7 +18,7 @@ reduce(x, ...)
 
 \item{endo}{the endogeneous variables for which the related exogeneous variables should be aggregated}
 
-\item{rm.exo}{should the exogeneous variables be remove from the object}
+\item{clean}{should the lvm object be simplified using the \code{clean} function}
 }
 \description{
 Aggregate exogeneous variables into a linear predictor

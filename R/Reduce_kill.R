@@ -3,7 +3,7 @@
 #' @name killLP
 #' 
 #' @param x \code{lvm}-object
-#' @param value the name of the links that should be removed
+#' @param value the names of the links that should be removed
 #' @param lp should the variables be removed from the linear predictor
 #' @param expar should the external parameters be also removed
 #' @param restaure should the link be kept while removing the linear predictor
@@ -21,20 +21,21 @@
 #' kill(rm, lp = FALSE, value = ~x4+x5)
 #'
 #'
-#' m <- lvm()
-#' regression(m) <- y ~ x1+x2+x3
-#' cancel(m) <- ~x1+x2+x3
-#' cancel(m, c("x1","x2","x3"))
-#' cancel(m) <- y~x1+x2+x3
+#' m <- lvm.reduced()
+#' regression(m) <- y1 ~ x1+x2+x3
+#' regression(m) <- y2 ~ z
+#' covariance(m) <- y1 ~ y2
+#' cancel(m) <- y1~x1+x2+x3
 #' m
-#'
+#' cancel(m) <- "y1 ~~ y2"
+#' coef(m)
 #' 
 #' # see test/testthat/test-cancel.R
 
 # {{{ kill.lvm.reduce
 #' @rdname killLP
 #' @export
-kill.lvm.reduced  <- function(x, value = NULL, lp = TRUE, expar = TRUE, restaure = FALSE,
+kill.lvm.reduced  <- function(x, value, lp = TRUE, expar = TRUE, restaure = FALSE,
                               clean = TRUE, ...){
 
     ## normalize value
@@ -54,7 +55,6 @@ kill.lvm.reduced  <- function(x, value = NULL, lp = TRUE, expar = TRUE, restaure
             x <- cancel(x, value = lp(x, lp = lp.rm, type = "link"), expar = expar, restaure = restaure, clean = FALSE)    
         }
 
-        ## if the object is still lvm.reduce (could not be the case if all lp has been removed and simplify is TRUE)
         ## remove variables in the linear predictor
         if(lp && any(value %in% lp(x, type = "x"))){ 
             var.rm <- value[value %in% lp(x, type = "x")]
@@ -91,7 +91,7 @@ kill.lvm.reduced  <- function(x, value = NULL, lp = TRUE, expar = TRUE, restaure
 # {{{ cancel.lvm.reduce
 #' @name killLP
 #' @export
-cancel.lvm.reduced  <- function(x, value = NULL, expar = TRUE, restaure = FALSE,
+cancel.lvm.reduced  <- function(x, value, expar = TRUE, restaure = FALSE,
                                 clean = FALSE, ...){
 
     ## normalize value

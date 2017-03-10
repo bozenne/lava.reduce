@@ -1,4 +1,5 @@
-#### intialisation ####
+
+# {{{ intialisation
 
 #' @title Initialize a linear predictor
 #' @description Initialise a linear predictor
@@ -29,8 +30,9 @@ lvm.reduced <- function(...){
   return(x)
 }
 
-#### convertion ####
+# }}}
 
+# {{{ conversion
 #' @title Conversion to a latent variable model with linear predictors
 #' @description Add the possibility to use linear predictor in a latent variable model
 #' 
@@ -50,8 +52,10 @@ lvm2reduce <- function(x){
   return(x)
 }
 
-#### specification ####
+# }}}
+# {{{ reduce
 
+# {{{ doc
 #' @title Reduce latent variable model
 #' @name reduce
 #' @description Aggregate exogeneous variables into a linear predictor
@@ -66,86 +70,92 @@ lvm2reduce <- function(x){
 #' ## regression
 #' m <- lvm()
 #' m <- regression(m, x=paste0("x",1:10),y="y")
-#' 
 #' m
-#' reduce(m)
+#'
+#' mtest <- m
+#' cancel(mtest) <- y ~ x1 + x2 + x3 + x4 + x5
+#' mtest
+#' coef(mtest)
+#' rm <- reduce(m)
+#' rm
+#' lp(rm, type = "link")
+#' coef(rm)
+#' 
 #' coef(reduce(m))
 #' reduce(m, rm.exo = FALSE)
+#' 
+#' reduce(m, link = paste0("y~x",1:5))
 #' 
 #' ## lvm
 #' m <- lvm()
 #' m <- regression(m, x=paste0("x",1:10),y="y1")
 #' m <- regression(m, x=paste0("x",11:30),y="y2")
 #' covariance(m) <- y1~y2
-#' 
-#' m
-#' reduce(m)
-#' coef(reduce(m))
+#'
+#' system.time(
+#' rm <- reduce(m)
+#' )
+#' coef(rm)
 #' reduce(m, rm.exo = FALSE)
 #'
 #' @export
 `reduce` <-
   function(x,...) UseMethod("reduce")
+# }}}
 
+# {{{ reduce.lvm 
 #' @rdname reduce
 #' @export
 reduce.lvm <- function(x, link = NULL, endo = NULL, rm.exo = TRUE, ...){
 
-  #### define the links
-  if(!is.null(link)){ # reduce specific links
-    if("formula" %in% class(link)){ link <- list(link) }
-    ls.link <- lapply(link, initVar_link, repVar1 = TRUE)
-    vec.endo <- unlist(lapply(ls.link, "[[", 1))
-    vec.exo <- unlist(lapply(ls.link, "[[", 2))
-    
-    exo <- tapply(vec.exo, vec.endo, list)
-    endo <- names(exo)
-   
-  }else{ # reduce the linear predictor of specific endogeneous variables
+  if(is.null(link)){ # reduce the linear predictor of specific endogeneous variables
+  
     if(is.null(endo)){endo <- lava::endogenous(x)}
-    
+
     # if nothing to reduce return object
-    remaining.exo <- intersect(vars(x, lp = FALSE), exogenous(x, lp = FALSE, xlp = TRUE))
-    if(length(remaining.exo)==0){return(x)}
+    remaining.exo <- intersect(vars(x, lp = FALSE), 
+                               exogenous(x, lp = FALSE, xlp = TRUE))
+    if(length(remaining.exo)==0){
+      cat("All exogenous variables has already been reduces \n")
+      return(x)
+    }
     
     M <- x$M[remaining.exo,endo, drop = FALSE]
+    oneSearch <- which(M==1, arr.ind = TRUE)
     
-    col.reg <- names(which(apply(M, 2, function(i){any(i==1)}))) # find endo having exo
-    exo <- lapply(col.reg, function(var){rownames(M)[which(M[,var,drop = FALSE]==1)]})
-    names(exo) <- col.reg
-    
-    if(is.null(names(exo))){
-      cat("no regression model has been found in the object \n")
+    if(NROW(oneSearch) == 0){
+      cat("No regression model has been found in the object \n")
       return(x)
-    }else{
-      endo <- names(exo)#vars(x)[index.reduce]
     }
+    
+    link <- paste(colnames(M)[oneSearch[,2]],
+                  rownames(M)[oneSearch[,1]],
+                  sep = lava.options()$symbols[1])
     
   }
   
-  #### reduce
-  n.endo <- length(endo)
-  for(iterR in 1:n.endo){
-    name.endo <- endo[iterR]
-    name.exo <- exo[[iterR]]
-    
-    if(length(name.exo)>0){
-      ## can be problematic as we don't know about "additive" or other possibly relevant arguments
-      f <- stats::as.formula(paste(name.endo,"~",paste(name.exo, collapse = "+")))
-      
-      cancel(x) <- f
-      
-      if("lvm.reduced" %in% class(x) == FALSE){
+  #### define the links
+  # can be problematic as we don't know about "additive" or other possibly relevant arguments
+  ls.link <- combine.formula(link)
+  
+    #### reduce
+    n.endo <- length(ls.link)
+    if("lvm.reduced" %in% class(x) == FALSE){
         x <- lvm2reduce(x)
-      }
-      x <- regression(x, to = name.endo, from = name.exo, reduce = TRUE)
     }
-  }
-  
-  if(rm.exo){
-    indexClean <- which(rowSums(x$index$A[x$exogenous,,drop = FALSE]!=0)==0)
-    x <- kill(x, lp = FALSE, value = x$exogenous[indexClean])
-  }
+
+    for(iterR in 1:n.endo){# iterR <- 1
+        cancel(x) <- ls.link[[iterR]]
+        regression(x, reduce = TRUE) <- ls.link[[iterR]]
+
+    }
+    if(rm.exo){
+        indexClean <- which(rowSums(x$index$A[x$exogenous,,drop = FALSE]!=0)==0)
+        x <- kill(x, lp = FALSE, value = x$exogenous[indexClean])
+    }
   
   return(x)
 }
+# }}}
+
+# }}}

@@ -1,3 +1,6 @@
+# {{{ lp
+
+# {{{ doc
 #' @title Extract the linear predictors
 #' @name lp
 #' @description Extract the linear predictors of a lvm object
@@ -28,7 +31,9 @@
 #' @rdname lp 
 #' @export
 `lp` <- function(x,...) UseMethod("lp")
+# }}}
 
+# {{{ lp.lvm.reduced
 #' @rdname lp 
 #' @export
 lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
@@ -128,8 +133,13 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
   return(res)
   
 }
+# }}}
 
+# }}}
 
+# {{{ lp<-
+
+# {{{ doc
 #' @title Update linear predictors
 #' @name updateLP
 #' @description Update linear predictors of a lvm object
@@ -157,7 +167,9 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
 #' @rdname updateLP
 #' @export
 `lp<-` <- function(x, ..., value) UseMethod("lp<-")
+# }}}
 
+# {{{ lp<-.lvm.reduce
 #' @rdname updateLP 
 #' @export
 `lp<-.lvm.reduced` <- function(x, lp = NULL, ..., value){
@@ -195,4 +207,6 @@ lp.lvm.reduced <- function(x, type = "name", lp = NULL, format = "vector", ...){
   return(x)
   
 }
+# }}}
 
+# }}}

@@ -7,10 +7,10 @@
 \title{Remove variables from linear predictors}
 \usage{
 \method{kill}{lvm.reduced}(x, value = NULL, lp = TRUE, expar = TRUE,
-  restaure = FALSE, simplify = TRUE, ...)
+  restaure = FALSE, clean = TRUE, ...)
 
 \method{cancel}{lvm.reduced}(x, value = NULL, expar = TRUE,
-  restaure = FALSE, simplify = TRUE, ...)
+  restaure = FALSE, clean = FALSE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}
@@ -23,14 +23,32 @@
 
 \item{restaure}{should the link be kept while removing the linear predictor}
 
-\item{simplify}{should the class \code{lvm.reduced} be removed is from the \code{lvm}-object if it contains no LP.}
+\item{clean}{should the lvm object be simplified using the \code{clean} function}
 
-\item{...}{argument passed to \code{kill.lvm.reduced}}
+\item{...}{argument passed to \code{clean}}
 }
 \description{
 Remove one or several variable from the linear predictors
 }
 \examples{
+
+m <- lvm()
+m <- regression(m, x=paste0("x",1:10),y="y")
+rm <- reduce(m, rm.exo = FALSE)
+
+kill(rm, lp = FALSE, value = "x1")
+kill(rm, lp = FALSE, value = c("x2","x3"))
+kill(rm, lp = FALSE, value = ~x4+x5)
+
+
+m <- lvm()
+regression(m) <- y ~ x1+x2+x3
+cancel(m) <- ~x1+x2+x3
+cancel(m, c("x1","x2","x3"))
+cancel(m) <- y~x1+x2+x3
+m
+
+
 # see test/testthat/test-cancel.R
 }
 

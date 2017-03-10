@@ -6,9 +6,10 @@
 gaussian1LP_gradient.lvm <- lava.reduce:::gaussian1LP_gradient.lvm
   
 context("#### Reduce #### \n")
+lava.options(symbols = c(";","<->"))
 
 m <- lvm()
-m <- regression(m,y='y1',x='x'%++%1:2)
+regression(m) <- y1 ~ x1 + x2
 m.red <- reduce(m)
 
 test_that("reduce twice",{

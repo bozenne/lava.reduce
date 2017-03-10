@@ -27,11 +27,21 @@ Aggregate exogeneous variables into a linear predictor
 ## regression
 m <- lvm()
 m <- regression(m, x=paste0("x",1:10),y="y")
-
 m
-reduce(m)
+
+mtest <- m
+cancel(mtest) <- y ~ x1 + x2 + x3 + x4 + x5
+mtest
+coef(mtest)
+rm <- reduce(m)
+rm
+lp(rm, type = "link")
+coef(rm)
+
 coef(reduce(m))
 reduce(m, rm.exo = FALSE)
+
+reduce(m, link = paste0("y~x",1:5))
 
 ## lvm
 m <- lvm()
@@ -39,9 +49,10 @@ m <- regression(m, x=paste0("x",1:10),y="y1")
 m <- regression(m, x=paste0("x",11:30),y="y2")
 covariance(m) <- y1~y2
 
-m
-reduce(m)
-coef(reduce(m))
+system.time(
+rm <- reduce(m)
+)
+coef(rm)
 reduce(m, rm.exo = FALSE)
 
 }

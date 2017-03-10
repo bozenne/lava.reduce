@@ -1,3 +1,4 @@
+# {{{ doc
 #' @title Extract variables from a reduced latent variable model
 #' @name getReduce
 #' @description Extract variables as in a standard lvm but including or not the variables that compose the linear predictor
@@ -44,7 +45,10 @@
 #' 
 #' endogenous(m)
 #' endogenous(m, lp = FALSE) # should not change
+# }}}
 
+
+# {{{ vars.lvm.reduced
 #' @rdname getReduce 
 #' @export
 vars.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...){
@@ -64,7 +68,8 @@ vars.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...){
   
   return(setdiff(allVars,names.lp))
 }
-
+# }}}
+# {{{ exogenous.lvm.reduced
 #' @rdname getReduce 
 #' @export
 exogenous.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...){
@@ -85,7 +90,8 @@ exogenous.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...){
   
   return(setdiff(allExo, names.lp))
 }
-
+# }}}
+# {{{ endogenous.lvm.reduced
 #' @rdname getReduce 
 #' @export
 endogenous.lvm.reduced <- function(x, top = FALSE, latent = FALSE, ...){
@@ -104,7 +110,8 @@ endogenous.lvm.reduced <- function(x, top = FALSE, latent = FALSE, ...){
   return(setdiff(observed,exo))
   
 }
-
+# }}}
+# {{{ manifest.lvm.reduced
 #' @rdname getReduce
 #' @export
 manifest.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...) {
@@ -115,3 +122,4 @@ manifest.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...) {
   else
     NULL
 }
+# }}}

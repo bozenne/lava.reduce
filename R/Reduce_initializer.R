@@ -1,19 +1,18 @@
+# {{{ doc
 #' @title Initialise \code{lvm.reduced}
-#' @name initCoef
+#' @name initializer
 #' @description Estimate initial values for the parameters contained in a \code{lvm.reduced} object
 #' 
 #' @inheritParams estimate.lvm.reduced
 #' @param optim control/optimization parameters
 #' @param ... additional arguments to be passed to the low level functions
 #' 
+# }}}
 
-#' @rdname initCoef
+# {{{ initializer.lava.reduce
+#' @rdname initializer
 #' @export
-`initCoef` <-  function(x,...) UseMethod("initCoef")
-
-#' @rdname initCoef
-#' @export
-initCoef <- function(x, data, optim, ...){
+initializer.lava.reduce <- function(x, data, optim, ...){
   
   ## compute moment
   dd <- procdata.lvm(x, data = data) # callS3methodParent(x, FUN = "procdata", class = "lvm.reduced", data = data)
@@ -75,6 +74,7 @@ initCoef <- function(x, data, optim, ...){
   return(start)
   
 }
+# }}}
 
 
 

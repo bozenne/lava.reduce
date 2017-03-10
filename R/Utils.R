@@ -1,38 +1,75 @@
+# {{{ initVar
 #' @title Normalize var1 and var2
+#' @name initVar
 #' @description Convert var1 and var2 from formula or covariance to character
 #' 
 #' @param var1 a character indicating the endogeneous variable or a formula
 #' @param var2 an optional character indicating the exogeneous variable
 #' @param repVar1 should var1 be duplicated to match var2 length. Only active if format = "list".
 #' @param format should the name of the variable be return (format = "list"), a vector of character formula ("txt.formula") or a list of formula ("formula")
+#' @param Slink the symbol for regression link
+#' @param Scov the symbol for covariance link
 #' 
 #' @details See test file test/testthat/test-Reduce.R for examples
+#'
+#' @examples
+#' initVar_link(y ~ x1)
+#' initVar_link("y ~ x1")
+#' initVar_link(y ~ x1 + x2)
+#' initVar_link("y ~ x1 + x2")
+#' initVar_link(y ~ x1 + x2, repVar1 = TRUE)
+#' initVar_link(y ~ x1 + x2, repVar1 = TRUE, format = "formula")
+#' initVar_link(y ~ x1 + x2, repVar1 = TRUE, format = "txt.formula")
+#' initVar_link("y", "x1", format = "formula")
+#'
+#' initVar_link("y ~ x1:0|1")
+#' 
+#'
+#' initVar_links(y ~ x1)
+#' initVar_links("y ~ x1")
+#' initVar_links(c("y ~ x1","y~ x2"))
+#' initVar_links(c(y ~ x1,y ~ x2))
+#' initVar_links(c("y ~ x1","y~ x2"), format = "formula")
+#' initVar_links(c(y ~ x1,y ~ x2), format = "formula")
+#' initVar_links(c("y ~ x1","y~ x2"), format = "txt.formula")
+#' initVar_links(c(y ~ x1,y ~ x2), format = "txt.formula")
+
+#' @rdname initVar
 #' @export
-initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
-  Slink <- lava.options()$symbols[1]
-  # pSlink <- paste(c(Slink,"~"), collapse = "|")
-  Scov <- lava.options()$symbols[2]
- 
-  if(missing(var2) && is.character(var1)){ 
-    if(grepl(Scov,var1)==TRUE){ ## covariance
-      Scov <- names(unlist(sapply(Scov, grep, x = var1)))[1]
-      var1 <- gsub(Scov,"~", x = var1)
-      sep <- Scov
+initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list",
+                         Slink = lava.options()$symbols[1],
+                         Scov = lava.options()$symbols[2]){
+
+    format <- match.arg(format, c("list","txt.formula","formula"))
+    
+    if(missing(var2)){
+      
+        if(class(var1) == "formula"){
+            var2 <- select.regressor(var1, type = "vars")
+            var1 <- select.response(var1, type = "vars")
+            sep <- if(format == "formula"){"~"}else{Slink}
+        }else if(grepl(Scov,var1)==TRUE){ ## covariance
+            varSplit <- strsplit(var1, split = Scov)[[1]]
+            var1 <- trimws(varSplit[1])
+            var2 <- trimws(varSplit[2])
+            sep <- if(format == "formula"){"~"}else{Scov}
+        } else if(grepl(Slink,var1)==TRUE){ ## regression
+            varSplit <- strsplit(var1, split = Slink)[[1]]
+            var1 <- trimws(varSplit[1])
+            var2 <- trimws(varSplit[2])
+            sep <- if(format == "formula"){"~"}else{Slink}
+        } else {
+            stop("unable to identify the two sides of the formula in \'var1\' \n",
+                 "convert it to formula or specify \'Slink\' or \'Scov\' \n")
+        }
+    }else{
+
+        if(!is.character(var1) || !is.character(var2)){
+            stop("\'var1\' and \'var2\' must be characters when both are specified \n")
+        }
+        sep <- if(format == "formula"){"~"}else{Slink}        
     }
-    if(grepl(Slink,var1)==TRUE){ # regression
-      Slink <- names(unlist(sapply(c(Slink,"~"), grep, x = var1)))[1]
-      var1 <- stats::as.formula(gsub(Slink,"~",var1))
-      sep <- if(format == "formula"){"~"}else{Slink}
-    }
-  }else{
-    sep <- if(format == "formula"){"~"}else{Slink}
-  }
   
-  if(class(var1) == "formula"){
-    var2 <- select.regressor(var1, type = "vars")
-    n.var2 <- length(var2)
-    var1 <- select.response(var1, type = "vars")
-  }
   
   #### convert to format
   if(format == "formula"){
@@ -56,9 +93,78 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list"){
   ## export 
   return(res)
 }
+# }}}
 
+# {{{ initVar_links
+#' @rdname initVar
+#' @export
+initVar_links <- function(var1, format = "list"){
+        
+    if("formula" %in% class(var1)){
+        res <- initVar_link(var1, repVar1 = TRUE, format = format)
+    }else {
+        res <- sapply(var1, function(x){
+            initVar_link(x, repVar1 = TRUE, format = format)
+        })
+        if(format == "list"){
+            res <- list(var1 = unname(unlist(res["var1",])),
+                        var2 = unname(unlist(res["var2",])))
+        }else{
+            res <- unname(unlist(res))
+        }
+    }
 
+    return(res)
+    
+}
+# }}}
 
+# {{{ combine.formula
+#' @title Combine formula
+#' @description Combine formula by outcome
+#' 
+#' @param ls.formula a list of formula
+#' @param as.formula should a list of formula be returned. Otherwise it will be a list of characters.
+#' @param as.unique should regressors appears at most once in the formula
+#' 
+#' @examples
+#' combine.formula(list(Y~X1,Y~X3+X5,Y1~X2))
+#' lava.options(symbols = c("~",","))
+#' combine.formula(list("Y~X1","Y~X3+X5","Y1~X2"))
+#' lava.options(symbols = c("<-","<->"))
+#' combine.formula(list("Y<-X1","Y<-X3+X5","Y1<-X2"))
+#' 
+#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2))
+#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2), as.formula = FALSE)
+#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2), as.unique = TRUE)
+#' 
+#' lava.options(symbols = c("~","~~"))
+#' combine.formula(list("Y~X1","Y~X3","Y1~X2"))
+#' 
+#' @export
+combine.formula <- function(ls.formula, as.formula = TRUE, as.unique = FALSE){
+  
+  if(length(ls.formula)==0){return(NULL)}
+  ls.Vars <- initVar_links(ls.formula, format = "list")
+  
+  ls.endogeneous <- ls.Vars$var1
+  ls.X <- ls.Vars$var2
+  endogenous <- unique(ls.endogeneous)
+  n.endogeneous <- length(endogenous)
+  
+  ls.formula2 <- vector(n.endogeneous, mode = "list")
+  for(iterE in 1:n.endogeneous){
+    X <- unlist(ls.X[which(ls.endogeneous==endogenous[iterE])])
+    if(as.unique){X <- unique(X)}
+    txt <- paste(endogenous[iterE],"~",paste(X, collapse = " + "))
+    if(as.formula){ls.formula2[[iterE]] <- as.formula(txt)}else{ls.formula2[[iterE]] <- txt}
+  }
+  
+  return(ls.formula2)
+}
+# }}}
+
+# {{{ select.response
 #' @title Response variable of a formula
 #' @description Return the reponse variable contained in the formula
 #' @name select.response
@@ -98,7 +204,9 @@ select.response.formula <- function(x, type = "call", ...){
   
   return(res)
 }
+# }}}
 
+# {{{ select.regressor
 #' @title Regressor of a formula
 #' @description Return the regressor variables contained in the formula
 #' @name select.regressor
@@ -142,51 +250,12 @@ select.regressor.formula <- function(x, type = "call", ...){
   
   return(res)
 }
-
-#' @title Combine formula
-#' @description Combine formula by outcome
-#' 
-#' @param ls.formula a list of formula
-#' @param as.formula should as.formula be applied to each element of the list
-#' @param as.unique should regressors appears at most once in the formula
-#' 
-#' @examples
-#' combine.formula(list(Y~X1,Y~X3+X5,Y1~X2))
-#' lava.options(symbols = c("~",","))
-#' combine.formula(list("Y~X1","Y~X3+X5","Y1~X2"))
-#' lava.options(symbols = c("<-","<->"))
-#' combine.formula(list("Y<-X1","Y<-X3+X5","Y1<-X2"))
-#' 
-#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2))
-#' combine.formula(list(Y~X1,Y~X3+X1,Y1~X2), as.unique = TRUE)
-#' 
-#' @export
-combine.formula <- function(ls.formula, as.formula = TRUE, as.unique = FALSE){
-  
-  if(length(ls.formula)==0){return(NULL)}
-  if(class(ls.formula)=="formula"){ls.formula <- list(ls.formula)}
-  
-  ls.Vars <- lapply(ls.formula, initVar_link)
-  
-  ls.endogeneous <- unlist(lapply(ls.Vars, "[[", 1))
-  ls.X <- lapply(ls.Vars, "[[", 2)
-  endogenous <- unique(ls.endogeneous)
-  n.endogeneous <- length(endogenous)
-  
-  ls.formula2 <- vector(n.endogeneous, mode = "list")
-  for(iterE in 1:n.endogeneous){
-    X <- unlist(ls.X[which(ls.endogeneous==endogenous[iterE])])
-    if(as.unique){X <- unique(X)}
-    txt <- paste(endogenous[iterE],"~",paste(X, collapse = " + "))
-    ls.formula2[[iterE]] <- as.formula(txt)
-  }
-  
-  return(ls.formula2)
-}
+# }}}
 
 
 #### NOT USED ####
 
+# {{{ formula2character
 #' @title formula character conversion
 #' @description Conversion of formula into character string or vice versa
 #' @name convFormulaCharacter
@@ -221,7 +290,9 @@ formula2character <- function(f, type = "formula"){
   return(gsub("[[:blank:]]","",txt))
   
 }
+# }}}
 
+# {{{ character2formula
 #' @rdname convFormulaCharacter
 #' @export
 character2formula <- function(txt){
@@ -230,7 +301,9 @@ character2formula <- function(txt){
   return(stats::as.formula(txt))
   
 }
+# }}}
 
+# {{{ getS3methodParent 
 #' @title Find methods belonging to other classes
 #' @description Find methods that apply to the object for each class of the object
 #' 
@@ -292,7 +365,9 @@ getS3methodParent <- function(object, FUN, class = 1, export = "all", value = FA
      return(ls.method)
    }
 }
+# }}}
 
+# {{{ callS3methodParent
 #' @title Call the first method inhereted by the object
 #' @description Call the first method inhereted by the object
 #' 
@@ -312,3 +387,4 @@ callS3methodParent <- function(object, FUN, class = 1,...){
   return(getS3methodParent(object, FUN = FUN, class = class, export = "first", value = TRUE)(object, ...))
   
 }
+# }}}

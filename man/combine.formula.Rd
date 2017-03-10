@@ -9,7 +9,7 @@ combine.formula(ls.formula, as.formula = TRUE, as.unique = FALSE)
 \arguments{
 \item{ls.formula}{a list of formula}
 
-\item{as.formula}{should as.formula be applied to each element of the list}
+\item{as.formula}{should a list of formula be returned. Otherwise it will be a list of characters.}
 
 \item{as.unique}{should regressors appears at most once in the formula}
 }
@@ -24,7 +24,11 @@ lava.options(symbols = c("<-","<->"))
 combine.formula(list("Y<-X1","Y<-X3+X5","Y1<-X2"))
 
 combine.formula(list(Y~X1,Y~X3+X1,Y1~X2))
+combine.formula(list(Y~X1,Y~X3+X1,Y1~X2), as.formula = FALSE)
 combine.formula(list(Y~X1,Y~X3+X1,Y1~X2), as.unique = TRUE)
+
+lava.options(symbols = c("~","~~"))
+combine.formula(list("Y~X1","Y~X3","Y1~X2"))
 
 }
 

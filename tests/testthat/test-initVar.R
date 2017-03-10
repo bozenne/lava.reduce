@@ -6,7 +6,7 @@ context("#### initVar #### \n")
 
 initVar_link <-  lava.reduce:::initVar_link
 
-lava.options(symbol = c("~",","))
+lava.options(symbols = c("~","~~"))
 
 test_that("initVar - two different variables",{
   l <- list(var1 = "a", var2 = "b")  
@@ -56,6 +56,5 @@ initVar_link(var1 = "Y<-X1+X2", repVar1 = TRUE)
 initVar_link(var1 = "Y<-X1+X2", format = "formula")
 initVar_link(var1 = "Y<-X1+X2", format = "txt.formula")
 
-initVar_link(var1 = "X1")
 
 

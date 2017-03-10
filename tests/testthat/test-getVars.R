@@ -90,7 +90,7 @@ m <- regression(m, x=c("eta",exo.name[[3]]), y=endo.name[[3]])
 latent(m) <- "eta"
 mr <- reduce(m)
 
-lp.name <- lp(mr)
+lp.name <- unname(lp(mr))
 
 test_that("lp - reduce all model", {
   

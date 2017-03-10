@@ -2,5 +2,54 @@
 <a href="https://travis-ci.org/bozenne/lava.reduce"><img src="https://travis-ci.org/bozenne/lava.reduce.svg?branch=master"></a>
 #+END_HTML
 
-# lava.reduce
-lava plugin allowing LVM with linear predictors
+* lava.reduce
+
+
+** example
+
+First define a standard =lvm= model:
+#+BEGIN_SRC R :exports both :results output
+m <- lvm()
+m <- regression(m, x=paste0("x",1:10),y="y1")
+m <- regression(m, x=paste0("z",1:10),y="y2")
+covariance(m) <- y1~y2
+m
+
+set.seed(10)
+df.data <- sim(m, 1e2)
+#+END_SRC
+
+Since the number of covariate can be large, we would like to consider only the linear predictor for each outcome:
+#+BEGIN_SRC R :exports both :results output
+  mr <- reduce(m)
+  plot(mr)
+  coef(mr)
+#+END_SRC
+
+Then we can estimate the model:
+#+BEGIN_SRC R :exports both :results output graphics :file inst/lava1.png  
+  e.mr <- estimate(mr, data = df.data, control = list(constrain = TRUE))
+  coef(e.mr)
+#+END_SRC
+
+
+and check that the estimates match with the one of the standard =lvm=
+#+BEGIN_SRC R :exports both :results output graphics :file inst/lava1.png  
+  e.m <- estimate(m, data = df.data)
+  coef(e.m)
+#+END_SRC
+
+#+RESULTS:
+[[file:inst/lava1.png]]
+
+#+TITLE: Plugin for =lava= allowing LVM with linear predictors (=lava.reduce=)
+#+AUTHOR: Brice Ozenne
+#+PROPERTY: header-args:R  :session *R* :cache no :width 550 :height 450
+#+PROPERTY: header-args  :eval never-export :exports results :results output :tangle yes :comments yes 
+#+PROPERTY: header-args:R+ :colnames yes :rownames no :hlines yes
+#+OPTIONS: timestamp:t title:t date:t author:t creator:nil toc:nil 
+#+OPTIONS: h:4 num:t tags:nil d:t
+#+PROPERTY: comments yes 
+#+STARTUP: hideall 
+#+OPTIONS: toc:t h:4 num:nil tags:nil
+

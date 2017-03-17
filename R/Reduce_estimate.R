@@ -4,12 +4,13 @@
 #' 
 #' @param x \code{lvm.reduced}-object
 #' @param data \code{data.frame}
+#' @param estimator \code{character}
 #' @param ... additional arguments to be passed to the low level functions
 #' 
 #' @example 
 #' R/examples/EX_reducedModel.R
 #' @export
-estimate.lvm.reduced <- function(x, data, ...){
+estimate.lvm.reduced <- function(x, data, estimator = "gaussian", ...){
   
   ####  add columns
   name.LP <- lp(x)
@@ -17,5 +18,5 @@ estimate.lvm.reduced <- function(x, data, ...){
                 matrix(0,nrow = NROW(data), ncol = length(name.LP), dimnames = list(NULL,name.LP))
   )
   
-  return(callS3methodParent(x, FUN = "estimate", class = "lvm.reduced", data=data, ...))
+  return(callS3methodParent(x, FUN = "estimate", class = "lvm.reduced", data=data, estimator = estimator, ...))
 }

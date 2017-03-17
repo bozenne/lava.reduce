@@ -6,16 +6,16 @@
 \alias{killLP}
 \title{Remove variables from linear predictors}
 \usage{
-\method{kill}{lvm.reduced}(x, value = NULL, lp = TRUE, expar = TRUE,
+\method{kill}{lvm.reduced}(x, value, lp = TRUE, expar = TRUE,
   restaure = FALSE, clean = TRUE, ...)
 
-\method{cancel}{lvm.reduced}(x, value = NULL, expar = TRUE,
-  restaure = FALSE, clean = FALSE, ...)
+\method{cancel}{lvm.reduced}(x, value, expar = TRUE, restaure = FALSE,
+  clean = FALSE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}
 
-\item{value}{the name of the links that should be removed}
+\item{value}{the names of the links that should be removed}
 
 \item{lp}{should the variables be removed from the linear predictor}
 
@@ -41,13 +41,14 @@ kill(rm, lp = FALSE, value = c("x2","x3"))
 kill(rm, lp = FALSE, value = ~x4+x5)
 
 
-m <- lvm()
-regression(m) <- y ~ x1+x2+x3
-cancel(m) <- ~x1+x2+x3
-cancel(m, c("x1","x2","x3"))
-cancel(m) <- y~x1+x2+x3
+m <- lvm.reduced()
+regression(m) <- y1 ~ x1+x2+x3
+regression(m) <- y2 ~ z
+covariance(m) <- y1 ~ y2
+cancel(m) <- y1~x1+x2+x3
 m
-
+cancel(m) <- "y1 ~~ y2"
+coef(m)
 
 # see test/testthat/test-cancel.R
 }

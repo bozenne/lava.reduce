@@ -4,7 +4,7 @@
 \alias{estimate.lvm.reduced}
 \title{Estimate a latent variable model with linear predictors (LP)}
 \usage{
-\method{estimate}{lvm.reduced}(x, data, ...)
+\method{estimate}{lvm.reduced}(x, data, estimator = "gaussian", ...)
 }
 \arguments{
 \item{x}{\code{lvm.reduced}-object}

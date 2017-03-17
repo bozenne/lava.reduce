@@ -3,15 +3,13 @@
 #' @description Pre and post processing methods
 #' 
 #' @inheritParams estimate.lvm.reduced
-#' @param weight for compatibility with lava
-#' @param weight2 for compatibility with lava
 #' @param estimator the function used to compute the derivatives of the objective function
 #' @param ... additional arguments to be passed to the low level functions
 #' 
 #' @export
-lava.reduce.estimate.hook <- function(x,data,weight,weight2,estimator,...) {
- 
-  dots <- list(...)
+lava.reduce.estimate.hook <- function(x,data,estimator,...) {
+
+    dots <- list(...)
   if("lvm.reduced" %in% class(x) && length(lp(x))>0){
 
     ## set reference endogeneous variable where there is no linear predictor
@@ -34,14 +32,14 @@ lava.reduce.estimate.hook <- function(x,data,weight,weight2,estimator,...) {
     ## 
     if(is.null(dots$optim$start)){ # intialisation of the parameters
       
-      ## non LP
-      x0 <- kill(x, value = lp(x), restaure = TRUE, clean = TRUE) # remove LP and external parameters
-      startLVM <- initializer.lava.reduce(x0, data = data, optim = dots$optim)
-      
-      ## update
-      dots$optim$start <- stats::setNames(rep(0, length = length(coef(x))), coef(x))
-      dots$optim$start[names(startLVM)] <- startLVM
-      dots$optim$start <- dots$optim$start[which(!is.na(dots$optim$start))]
+        ## non LP
+        x0 <- kill(x, value = lp(x), restaure = TRUE, clean = TRUE) # remove LP and external parameters
+        startLVM <- initializer.lava.reduce(x0, data = data, optim = dots$optim)
+        
+        ## update
+        dots$optim$start <- stats::setNames(rep(0, length = length(coef(x))), coef(x))
+        dots$optim$start[names(startLVM)] <- startLVM
+        dots$optim$start <- dots$optim$start[which(!is.na(dots$optim$start))]
     }
     
     ## update estimator
@@ -58,9 +56,8 @@ lava.reduce.estimate.hook <- function(x,data,weight,weight2,estimator,...) {
     }
     
     
-  }
-  
-  return(c(list(x=x,data=data,weight=weight,weight2=weight2,estimator=estimator),dots)) 
+  }       
+    return( c(list(x=x, data=data, estimator = estimator),dots) )
 }
 
 #' @rdname hookLVMreduced

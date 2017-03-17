@@ -6,7 +6,7 @@
 \alias{lava.reduce.post.hook}
 \title{Hook for \code{lvm.reduced} objects}
 \usage{
-lava.reduce.estimate.hook(x, data, weight, weight2, estimator, ...)
+lava.reduce.estimate.hook(x, data, estimator, ...)
 
 lava.reduce.post.hook(x)
 }
@@ -14,10 +14,6 @@ lava.reduce.post.hook(x)
 \item{x}{\code{lvm.reduced}-object}
 
 \item{data}{\code{data.frame}}
-
-\item{weight}{for compatibility with lava}
-
-\item{weight2}{for compatibility with lava}
 
 \item{estimator}{the function used to compute the derivatives of the objective function}
 

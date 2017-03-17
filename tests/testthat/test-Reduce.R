@@ -1,7 +1,6 @@
 # library(testthat)
 # library(lava.reduce)
-# library(lava)
-# butils:::package.source("lava.reduce", Rcode = TRUE, RorderDescription = FALSE)
+# butils.base::package.source("lava.reduce", Rcode = TRUE, RorderDescription = FALSE)
 
 gaussian1LP_gradient.lvm <- lava.reduce:::gaussian1LP_gradient.lvm
   

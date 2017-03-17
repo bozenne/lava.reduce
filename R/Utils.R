@@ -43,17 +43,16 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list",
     format <- match.arg(format, c("list","txt.formula","formula"))
     
     if(missing(var2)){
-      
         if(class(var1) == "formula"){
             var2 <- select.regressor(var1, type = "vars")
             var1 <- select.response(var1, type = "vars")
             sep <- if(format == "formula"){"~"}else{Slink}
-        }else if(grepl(Scov,var1)==TRUE){ ## covariance
+        }else if(grepl(Scov,var1,fixed=TRUE)==TRUE){ ## covariance
             varSplit <- strsplit(var1, split = Scov)[[1]]
             var1 <- trimws(varSplit[1])
             var2 <- trimws(varSplit[2])
             sep <- if(format == "formula"){"~"}else{Scov}
-        } else if(grepl(Slink,var1)==TRUE){ ## regression
+        } else if(grepl(Slink,var1,fixed=TRUE)==TRUE){ ## regression
             varSplit <- strsplit(var1, split = Slink)[[1]]
             var1 <- trimws(varSplit[1])
             var2 <- trimws(varSplit[2])
@@ -84,7 +83,6 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list",
     
   }else if(format == "list"){
     if(repVar1 && !missing(var1)){var1 <- rep(var1, length(var2))}
-    
     res <- list(var1 = var1,
                 var2 = if(!missing(var2)){var2}else{NULL} 
     )

@@ -58,8 +58,8 @@ initVar_link <- function(var1, var2, repVar1 = FALSE, format = "list",
             var2 <- trimws(varSplit[2])
             sep <- if(format == "formula"){"~"}else{Slink}
         } else {
-            stop("unable to identify the two sides of the formula in \'var1\' \n",
-                 "convert it to formula or specify \'Slink\' or \'Scov\' \n")
+            var1 <- var1
+            var2 <- NA
         }
     }else{
 
@@ -259,17 +259,11 @@ select.regressor.formula <- function(x, type = "call", ...){
 #' @name convFormulaCharacter
 #' 
 #' @param f a formula.
-#' @param txt a character string.
 #' @param type should the normal formula operator be used (\code{"formula"}) or the one of lava.option (\code{"symbols"} or \code{"symbol"}).
 #' 
 #' @examples
 #' formula2character(Y1~X1+X2)
 #' formula2character(Y1~X1+X2, type = "symbols")
-#' 
-#' character2formula("Y1~X1+X2")
-#' 
-#' m <- lvm(Y~X)
-#' character2formula(coef(m)[2])
 
 #' @rdname convFormulaCharacter
 #' @export
@@ -286,17 +280,6 @@ formula2character <- function(f, type = "formula"){
   }
   
   return(gsub("[[:blank:]]","",txt))
-  
-}
-# }}}
-
-# {{{ character2formula
-#' @rdname convFormulaCharacter
-#' @export
-character2formula <- function(txt){
-  
-  txt <- gsub(paste(lava.options()$symbols[1],lava.options()$symbol[1],sep="|"),"~",txt)
-  return(stats::as.formula(txt))
   
 }
 # }}}

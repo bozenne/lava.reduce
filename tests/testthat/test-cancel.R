@@ -1,3 +1,6 @@
+# library(butils.base)
+# package.source("lava.reduce")
+
 # library(testthat)
 # library(lava.reduce)
 # library(lava)
@@ -48,7 +51,7 @@ test_that("cancel coefficient in lp", {
 test_that("move coefficient from lp to normal", {
     coef2RM <- c("y1~x1","y1~x2")
     formula2RM <- combine.formula(coef2RM)[[1]]
-
+    
     mc <- cancel(m, formula2RM, restaure = TRUE)    
     expect_true(all(coef(m) %in% coef(mc)))
     expect_false(any(coef2RM %in% lp(mc, type = "link")))
@@ -66,12 +69,13 @@ test_that("remove a complete lp", {
     coef2RM <- lp(m, lp = lpName, type = "link")
     formula2RM <- combine.formula(coef2RM)[[1]]
 
-    mc <- cancel(m, formula2RM, clean = TRUE)
+    mc <- cancel(m, formula2RM)
+    mc <- clean(mc) 
     expect_false(lpName %in% lp(mc, type = "name"))
 
-    mc2 <- cancel(m, coef2RM, clean = TRUE)
-    mc3 <- m; cancel(mc3, clean = TRUE) <- formula2RM
-    mc4 <- m; cancel(mc4, clean = TRUE) <- coef2RM    
+    mc2 <- cancel(m, coef2RM) ; mc2 <- clean(mc2) ;
+    mc3 <- m; cancel(mc3) <- formula2RM ; mc3 <- clean(mc3) ;
+    mc4 <- m; cancel(mc4) <- coef2RM   ; mc4 <- clean(mc4) ;  
     expect_equal(mc,mc2)
     expect_equal(mc,mc3)
     expect_equal(mc,mc4)
@@ -79,7 +83,7 @@ test_that("remove a complete lp", {
     lpName <-  lp(m, type = "name")
     coef2RM <- lp(m, lp = lpName, type = "link")
 
-    mc <- cancel(m, coef2RM, clean = TRUE)    
+    mc <- cancel(m, coef2RM) ; mc <- clean(mc)
     expect_false("lvm.reduced" %in% class(mc))
 })
 # }}}
@@ -106,7 +110,7 @@ test_that("kill variables in linear predictors",{
     formula2RM <- as.formula(paste0("~",paste(var2RM,collapse ="+")))
     
     m1 <- m
-    kill(m1) <- formula2RM
+    kill(m1) <- formula2RM ; m1 <- clean(m1);    
     expect_false(any(var2RM %in% lp(m1, type = "x")))
     expect_false(any(var2RM %in% vars(m1)))
 
@@ -117,7 +121,7 @@ test_that("kill variables in linear predictors",{
     expect_equal(m1,m3)
     expect_equal(m1,m4)
 
-    m1 <- kill(m, unique(lp(m, type = "x")))
+    m1 <- kill(m, unique(lp(m, type = "x"))) ; m1 <- clean(m1)
     expect_false("lvm.reduced" %in% class(m1))
 })
 
@@ -126,19 +130,19 @@ test_that("kill linear predictors",{
     formula2RM <- as.formula(paste0("~",var2RM))
     
     m1 <- m
-    kill(m1) <- formula2RM
+    kill(m1) <- formula2RM ; m1 <- clean(m1)
     expect_false(var2RM %in% lp(m1, type = "name"))
     expect_false(any(lp(m, lp = var2RM, type = "link") %in% coef(m1)))
     expect_true(all(setdiff(coef(m),lp(m, lp = var2RM, type = "link")) %in% coef(m1)))
     
-    m2 <- kill(m, var2RM)
-    m3 <- m; kill(m3) <- formula2RM
-    m4 <- m; kill(m4) <- var2RM    
+    m2 <- kill(m, var2RM)           ; m2 <- clean(m2)
+    m3 <- m; kill(m3) <- formula2RM ; m3 <- clean(m3)
+    m4 <- m; kill(m4) <- var2RM     ; m4 <- clean(m4)
     expect_equal(m1,m2)
     expect_equal(m1,m3)
     expect_equal(m1,m4)
 
-    m1 <- kill(m, lp(m, type = "name"))
+    m1 <- kill(m, lp(m, type = "name")) ; m1 <- clean(m1);
     expect_false("lvm.reduced" %in% class(m1))
     expect_true(identical(vars(m1),vars(m, lp = FALSE)))    
 })

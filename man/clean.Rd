@@ -11,8 +11,8 @@ clean(x, ...)
 \method{clean}{lvm}(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE,
   ...)
 
-\method{clean}{lvm.reduced}(x, rm.lp = TRUE, simplify.reduce = TRUE,
-  simplify, ...)
+\method{clean}{lvm.reduced}(x, rm.exo = TRUE, rm.lp = TRUE,
+  simplify.reduce = TRUE, simplify, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}

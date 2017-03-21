@@ -11,6 +11,8 @@
 
 \item{data}{\code{data.frame}}
 
+\item{estimator}{\code{character}}
+
 \item{...}{additional arguments to be passed to the low level functions}
 }
 \description{

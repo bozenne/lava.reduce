@@ -3,22 +3,25 @@
 #' @name killLP
 #' 
 #' @param x \code{lvm}-object
-#' @param value the names of the links that should be removed
-#' @param lp should the variables be removed from the linear predictor
+#' @param var the names of the variables that should be removed
+#' @param value the names of the variables that should be removed
 #' @param expar should the external parameters be also removed
 #' @param restaure should the link be kept while removing the linear predictor
-#' @param clean should the lvm object be simplified using the \code{clean} function
 #' @param ... argument passed to \code{clean}
 #' 
 #' @examples
 #'
 #' m <- lvm()
 #' m <- regression(m, x=paste0("x",1:10),y="y")
+#' kill(m) <- "x7"
+#' 
 #' rm <- reduce(m, rm.exo = FALSE)
 #'
-#' kill(rm, lp = FALSE, value = "x1")
-#' kill(rm, lp = FALSE, value = c("x2","x3"))
-#' kill(rm, lp = FALSE, value = ~x4+x5)
+#' kill(rm) <- ~x6
+#' kill(rm, value = "x1")
+#' kill(rm, value = c("x2","x3"))
+#' kill(rm, value = ~x4+x5)
+#' kill(rm, value = ~LPy)
 #'
 #'
 #' m <- lvm.reduced()
@@ -32,56 +35,35 @@
 #' 
 #' # see test/testthat/test-cancel.R
 
-# {{{ kill.lvm.reduce
+# {{{ reduce.remove.hook
 #' @rdname killLP
 #' @export
-kill.lvm.reduced  <- function(x, value, lp = TRUE, expar = TRUE, restaure = FALSE,
-                              clean = TRUE, ...){
+lvmReduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
+                                ...){
 
-    ## normalize value
-    if("formula" %in% class(value)){
-        value <- select.regressor(value, type = "vars")
-    }
-
-    ## compatibility with lava
-    if(is.null(lp(x))){
-        
-        return(callS3methodParent(x, FUN = "kill", class = "lvm.reduced", value = value))
-        
-    }else{  ## lava.reduce
-        
-        if(any(value %in% lp(x))){ ## remove linear predictors
-            lp.rm <- value[value %in% lp(x)]
+      ## lvm object with linear predictor
+    if("lvm.reduced" %in% class(x)){
+        ## remove linear predictors
+        if(any(var %in% lp(x))){
+            lp.rm <- var[var %in% lp(x)]
             x <- cancel(x, value = lp(x, lp = lp.rm, type = "link"), expar = expar, restaure = restaure, clean = FALSE)    
         }
-
+           
         ## remove variables in the linear predictor
-        if(lp && any(value %in% lp(x, type = "x"))){ 
-            var.rm <- value[value %in% lp(x, type = "x")]
+        if(any(var %in% lp(x, type = "x"))){ 
+            var.rm <- var[var %in% lp(x, type = "x")]
             index.x <- lapply(lp(x, type = "x", format = "list2"), function(var){which(var$x %in% var.rm)})
             name.lp <- lp(x, type = "name")
-    
+
             for(iterLP in 1:length(index.x)){
                 if(length(index.x)==0){next}
-                x <- cancel(x, value = lp(x, lp = name.lp[iterLP], type = "link")[index.x[[iterLP]]], expar = expar,
-                            restaure = restaure, clean = FALSE)
+                x <- cancel(x, value = lp(x, lp = name.lp[iterLP], type = "link")[index.x[[iterLP]]],
+                            expar = expar, restaure = restaure, clean = FALSE)
             }
     
         }
-
-        ## remove variables outside the linear predictor
-        if(any(value %in% vars(x, lp = FALSE, xlp = FALSE))){ 
-            var.rm <- value[value %in% vars(x, lp = FALSE, xlp = FALSE)]
-    
-            x <- callS3methodParent(x, FUN = "kill", class = "lvm.reduced", value = var.rm)
-    
-        }
+      
     }
-
-    ## clean object
-    if(clean){
-        x <- clean(x, ...)
-    }   
   
   return(x)
 }
@@ -92,7 +74,7 @@ kill.lvm.reduced  <- function(x, value, lp = TRUE, expar = TRUE, restaure = FALS
 #' @name killLP
 #' @export
 cancel.lvm.reduced  <- function(x, value, expar = TRUE, restaure = FALSE,
-                                clean = FALSE, ...){
+                                ...){
 
     ## normalize value
     allCoef <- initVar_links(value, format = "txt.formula")
@@ -116,7 +98,7 @@ cancel.lvm.reduced  <- function(x, value, expar = TRUE, restaure = FALSE,
             #   x <- callS3methodParent(x, FUN = "cancel", class = "lvm.reduced", 
             #                           value = f.nlp[[iterF]])Q
             x <- callS3methodParent(x, FUN = "cancel", class = "lvm.reduced", 
-                                       value = c(list.nlp$var1[iterF],list.nlp$var2[iterF]))
+                                    value = c(list.nlp$var1[iterF],list.nlp$var2[iterF]))
         }
         
     }
@@ -160,11 +142,6 @@ cancel.lvm.reduced  <- function(x, value, expar = TRUE, restaure = FALSE,
             lp(x, lp = name.lp[iterLP]) <- newlp      
         }
     }
-
-    ## clean object
-    if(clean){
-        x <- clean(x, ...)
-    }    
   
     return(x)
 }

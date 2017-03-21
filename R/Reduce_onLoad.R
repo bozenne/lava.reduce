@@ -2,6 +2,7 @@
   
   lava::addhook("lava.reduce.estimate.hook", hook = "estimate.hooks")
   lava::addhook("lava.reduce.post.hook", hook = "post.hooks")
+  lava::addhook("lvmReduce.remove.hook", hook = "remove.hooks")
  
   lava::lava.options(estimator.default.reduce = "2",  # switch from gaussian moment to gaussian2 moment
                      init.restaure.reduce = TRUE) # initialise using all variables (else set the variables of the linear predictors to 0)

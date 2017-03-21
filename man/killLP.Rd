@@ -2,30 +2,26 @@
 % Please edit documentation in R/Reduce_kill.R
 \name{killLP}
 \alias{cancel.lvm.reduced}
-\alias{kill.lvm.reduced}
 \alias{killLP}
+\alias{lvmReduce.remove.hook}
 \title{Remove variables from linear predictors}
 \usage{
-\method{kill}{lvm.reduced}(x, value, lp = TRUE, expar = TRUE,
-  restaure = FALSE, clean = TRUE, ...)
+lvmReduce.remove.hook(x, var, expar = TRUE, restaure = FALSE, ...)
 
-\method{cancel}{lvm.reduced}(x, value, expar = TRUE, restaure = FALSE,
-  clean = FALSE, ...)
+\method{cancel}{lvm.reduced}(x, value, expar = TRUE, restaure = FALSE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}
 
-\item{value}{the names of the links that should be removed}
-
-\item{lp}{should the variables be removed from the linear predictor}
+\item{var}{the names of the variables that should be removed}
 
 \item{expar}{should the external parameters be also removed}
 
 \item{restaure}{should the link be kept while removing the linear predictor}
 
-\item{clean}{should the lvm object be simplified using the \code{clean} function}
-
 \item{...}{argument passed to \code{clean}}
+
+\item{value}{the names of the variables that should be removed}
 }
 \description{
 Remove one or several variable from the linear predictors
@@ -34,11 +30,15 @@ Remove one or several variable from the linear predictors
 
 m <- lvm()
 m <- regression(m, x=paste0("x",1:10),y="y")
+kill(m) <- "x7"
+
 rm <- reduce(m, rm.exo = FALSE)
 
-kill(rm, lp = FALSE, value = "x1")
-kill(rm, lp = FALSE, value = c("x2","x3"))
-kill(rm, lp = FALSE, value = ~x4+x5)
+kill(rm) <- ~x6
+kill(rm, value = "x1")
+kill(rm, value = c("x2","x3"))
+kill(rm, value = ~x4+x5)
+kill(rm, value = ~LPy)
 
 
 m <- lvm.reduced()

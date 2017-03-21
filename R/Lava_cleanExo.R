@@ -3,9 +3,9 @@
 ## author: Brice Ozenne
 ## created: mar 10 2017 (10:22) 
 ## Version: 
-## last-updated: mar 14 2017 (17:39) 
+## last-updated: mar 20 2017 (09:43) 
 ##           By: Brice Ozenne
-##     Update #: 40
+##     Update #: 58
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -91,9 +91,9 @@ clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
                                 intersect(indexClean.Creg, indexClean.Ccov))
         varClean <- c(varClean, var.latent[indexClean])
     }
-
+    
     if(length(varClean)>0){
-        x <- kill(x, lp = FALSE, value =  varClean)
+        x <- kill(x, value =  varClean)
     }
     return(x)
 }
@@ -102,24 +102,42 @@ clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
 # {{{ clean.lvm.reduced
 #' @rdname clean
 #' @export
-clean.lvm.reduced <- function(x, rm.lp = TRUE, simplify.reduce = TRUE, simplify, ...){
+clean.lvm.reduced <- function(x, rm.exo = TRUE, rm.lp = TRUE, simplify.reduce = TRUE, simplify, ...){
 
     if(!missing(simplify)){
         simplify.reduce <- simplify
     }
-    
+
     n.link <- lp(x, type = "n.link")
-    if(rm.lp && any(n.link==0)){
+    
+    if(rm.lp && any(n.link==0)){ ## remove empty lp
         name.lp <- names(n.link)[which(n.link==0)]
         x <- callS3methodParent(x, FUN = "kill", class = "lvm.reduced", value = name.lp)
         x$lp[lp(x, lp = name.lp, type = "endo")] <- NULL
     }
 
     if(simplify.reduce && length(lp(x, type = "link", format = "vector")) == 0 ){
-        class(x) <- setdiff(class(x), "lvm.reduced")
-        return(clean(x, simplify = simplify, ...))    
+        
+        class(x) <- setdiff(class(x), "lvm.reduced")        
+        return(clean(x, simplify = simplify, ...))
+        
     }else{
-        return(callS3methodParent(x, FUN = "clean", class = "lvm.reduced", simplify = simplify, ...))    
+        ## need to rm exo here to account for lp and not in clean.lvm
+        var.exogenous <- exogenous(x)
+        M.reg <- x$index$A
+        M.cov <- x$index$P - diag(diag(x$index$P))
+        
+        if(rm.exo && length(var.exogenous) > 0){
+            indexClean.reg <- which(rowSums(M.reg[var.exogenous,,drop = FALSE]!=0)==0)
+            indexClean.cov <- which(rowSums(M.cov[var.exogenous,,drop = FALSE]!=0)==0)
+            indexClean.lp <- which(var.exogenous %in% lp(x, type = "x") == FALSE)
+            indexClean <- intersect(indexClean.reg, intersect(indexClean.cov, indexClean.lp))
+            if(length(indexClean)>0){
+                x <- kill(x, value =  var.exogenous[indexClean])
+            }
+        }
+        
+        return(callS3methodParent(x, FUN = "clean", class = "lvm.reduced", simplify = simplify, rm.exo = FALSE, ...))    
     }
 
 }

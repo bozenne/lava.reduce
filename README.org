@@ -9,6 +9,8 @@
 
 First define a standard =lvm= model:
 #+BEGIN_SRC R :exports both :results output
+library(lava.reduce)
+
 m <- lvm()
 m <- regression(m, x=paste0("x",1:10),y="y1")
 m <- regression(m, x=paste0("z",1:10),y="y2")
@@ -20,32 +22,139 @@ df.data <- sim(m, 1e2)
 #+END_SRC
 
 #+RESULTS:
+#+begin_example
+Loading required package: lava
+lava version 1.5.1
+lava.reduce version 0.2
+Latent Variable Model
+                                                
+  y1 ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10   gaussian
+  y2 ~ z1+z2+z3+z4+z5+z6+z7+z8+z9+z10   gaussian
+
+Exogenous variables:                     
+  x1         gaussian
+  x2         gaussian
+  x3         gaussian
+  x4         gaussian
+  x5         gaussian
+  x6         gaussian
+  x7         gaussian
+  x8         gaussian
+  x9         gaussian
+  x10        gaussian
+  z1         gaussian
+  z2         gaussian
+  z3         gaussian
+  z4         gaussian
+  z5         gaussian
+  z6         gaussian
+  z7         gaussian
+  z8         gaussian
+  z9         gaussian
+  z10        gaussian
+#+end_example
 
 Since the number of covariate can be large, we would like to consider only the linear predictor for each outcome:
 #+BEGIN_SRC R :exports both :results output
-  mr <- reduce(m)
-  plot(mr)
-  coef(mr)
+mr <- reduce(m, simplify = TRUE)
+mr
 #+END_SRC
 
-Then we can estimate the model:
+#+RESULTS:
+#+begin_example
+Latent Variable Model
+                      
+  y1 ~ LPy1   gaussian
+  y2 ~ LPy2   gaussian
+
+Exogenous variables:                      
+  x1          gaussian
+  x2          gaussian
+  x3          gaussian
+  x4          gaussian
+  x5          gaussian
+  x6          gaussian
+  x7          gaussian
+  x8          gaussian
+  x9          gaussian
+  x10         gaussian
+  z1          gaussian
+  z2          gaussian
+  z3          gaussian
+  z4          gaussian
+  z5          gaussian
+  z6          gaussian
+  z7          gaussian
+  z8          gaussian
+  z9          gaussian
+  z10         gaussian
+  LPy1        gaussian
+  LPy2        gaussian
+#+end_example
+
+The parameters associated to the covariates in the linear predictor
+are now considered as external parameters:
+#+BEGIN_SRC R :exports both :results output
+coef(mr)
+#+END_SRC
+
+#+RESULTS:
+:       m1       m2       p1       p2       p3       e1       e2       e3       e4       e5       e6       e7       e8       e9      e10      e11      e12      e13      e14      e15 
+:     "y1"     "y2" "y1~~y1" "y2~~y2" "y1~~y2"  "y1~x1"  "y1~x2"  "y1~x3"  "y1~x4"  "y1~x5"  "y1~x6"  "y1~x7"  "y1~x8"  "y1~x9" "y1~x10"  "y2~z1"  "y2~z2"  "y2~z3"  "y2~z4"  "y2~z5" 
+:      e16      e17      e18      e19      e20 
+:  "y2~z6"  "y2~z7"  "y2~z8"  "y2~z9" "y2~z10"
+
+
+This will also simplify the graphical display of the model:
 #+BEGIN_SRC R :exports both :results output graphics :file inst/lava1.png  
+   plot(mr)
+#+END_SRC
+
+#+RESULTS:
+[[file:inst/lava1.png]]
+
+
+Then we can estimate the model:
+#+BEGIN_SRC R :exports both :results output
   e.mr <- estimate(mr, data = df.data, control = list(constrain = TRUE))
   coef(e.mr)
 #+END_SRC
 
 #+RESULTS:
-[[file:inst/lava1.png]]
+:          y1          y2      y1~~y1      y2~~y2      y1~~y2       y1~x1       y1~x2       y1~x3       y1~x4       y1~x5       y1~x6       y1~x7       y1~x8       y1~x9      y1~x10 
+: -0.13074998 -0.01754805  0.85586891  1.05513881  0.54344053  0.93672592  1.00944399  1.07045250  0.99182468  0.92266665  1.07494053  1.06341229  1.00513021  0.90690769  0.91347176 
+:       y2~z1       y2~z2       y2~z3       y2~z4       y2~z5       y2~z6       y2~z7       y2~z8       y2~z9      y2~z10 
+:  0.96586425  0.89987012  0.90914748  1.04065111  0.97182091  1.03423191  1.15779342  0.95841344  0.96804614  1.00299685
 
 
 and check that the estimates match with the one of the standard =lvm=
-#+BEGIN_SRC R :exports both :results output graphics :file inst/lava1.png  
+#+BEGIN_SRC R :exports both :results output
   e.m <- estimate(m, data = df.data)
   coef(e.m)
 #+END_SRC
 
 #+RESULTS:
-[[file:inst/lava1.png]]
+:          y1          y2       y1~x1       y1~x2       y1~x3       y1~x4       y1~x5       y1~x6       y1~x7       y1~x8       y1~x9      y1~x10       y2~z1       y2~z2       y2~z3 
+: -0.13074458 -0.01754648  0.93672381  1.00944610  1.07045206  0.99182646  0.92266858  1.07494250  1.06341339  1.00513184  0.90690349  0.91347119  0.96586967  0.89987524  0.90914869 
+:       y2~z4       y2~z5       y2~z6       y2~z7       y2~z8       y2~z9      y2~z10      y1~~y1      y2~~y2      y1~~y2 
+:  1.04065149  0.97182159  1.03422860  1.15778470  0.95840259  0.96804775  1.00299526  0.85585971  1.05512772  0.54343103
+
+** all functions
+
+#+BEGIN_SRC R :exports both :results output
+  ls(getNamespace("lava.reduce"), all.names=TRUE)
+#+END_SRC
+
+ [1] ".__DEVTOOLS__"             ".__NAMESPACE__."           ".__S3MethodsTable__."      ".onAttach"                 ".onLoad"                   ".packageName"              "calcLP"                   
+ [8] "callS3methodParent"        "cancel.lvm.reduced"        "character2formula"         "clean"                     "clean.lvm"                 "clean.lvm.reduced"         "combine.formula"          
+[15] "endogenous.lvm.reduced"    "estimate.lvm.reduced"      "exogenous.lvm.reduced"     "formula2character"         "gaussian1LP_gradient.lvm"  "gaussian1LP_hessian.lvm"   "gaussian1LP_logLik.lvm"   
+[22] "gaussian1LP_method.lvm"    "gaussian1LP_objective.lvm" "gaussian1LP_score.lvm"     "gaussian2LP_gradient.lvm"  "gaussian2LP_hessian.lvm"   "gaussian2LP_logLik.lvm"    "gaussian2LP_method.lvm"   
+[29] "gaussian2LP_objective.lvm" "gaussian2LP_score.lvm"     "gaussianLP_gradient.lvm"   "gaussianLP_hessian.lvm"    "gaussianLP_logLik.lvm"     "gaussianLP_method.lvm"     "gaussianLP_objective.lvm" 
+[36] "gaussianLP_score.lvm"      "getS3methodParent"         "initializer.lava.reduce"   "initLP"                    "initVar_link"              "initVar_links"             "kill.lvm.reduced"         
+[43] "latent<-.lvm.reduced"      "lava.reduce.estimate.hook" "lava.reduce.post.hook"     "lp"                        "lp.lvm.reduced"            "lp<-"                      "lp<-.lvm.reduced"         
+[50] "lvm.reduced"               "lvm2reduce"                "manifest.lvm.reduced"      "procdata.lvm"              "reduce"                    "reduce.lvm"                "regression.lvm.reduced"   
+[57] "regression<-.lvm.reduced"  "scoreLVM"                  "select.regressor"          "select.regressor.formula"  "select.response"           "select.response.formula"   "vars.lvm.reduced"         
+
 
 #+TITLE: Plugin for =lava= allowing LVM with linear predictors (=lava.reduce=)
 #+AUTHOR: Brice Ozenne

@@ -3,9 +3,9 @@
 ## author: Brice Ozenne
 ## created: mar 10 2017 (10:22) 
 ## Version: 
-## last-updated: mar 20 2017 (09:43) 
+## last-updated: apr  4 2017 (09:28) 
 ##           By: Brice Ozenne
-##     Update #: 58
+##     Update #: 68
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -102,9 +102,10 @@ clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
 # {{{ clean.lvm.reduced
 #' @rdname clean
 #' @export
-clean.lvm.reduced <- function(x, rm.exo = TRUE, rm.lp = TRUE, simplify.reduce = TRUE, simplify, ...){
+clean.lvm.reduced <- function(x, rm.exo = TRUE, rm.lp = TRUE,
+                              simplify.reduce = TRUE, simplify, ...){
 
-    if(!missing(simplify)){
+     if(!missing(simplify)){
         simplify.reduce <- simplify
     }
 
@@ -136,7 +137,7 @@ clean.lvm.reduced <- function(x, rm.exo = TRUE, rm.lp = TRUE, simplify.reduce = 
                 x <- kill(x, value =  var.exogenous[indexClean])
             }
         }
-        
+         
         return(callS3methodParent(x, FUN = "clean", class = "lvm.reduced", simplify = simplify, rm.exo = FALSE, ...))    
     }
 

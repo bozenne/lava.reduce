@@ -3,7 +3,7 @@
 \name{clean}
 \alias{clean}
 \alias{clean.lvm}
-\alias{clean.lvm.reduced}
+\alias{lava.reduce.clean.hook}
 \title{Simplify a lvm object}
 \usage{
 clean(x, ...)
@@ -11,8 +11,8 @@ clean(x, ...)
 \method{clean}{lvm}(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE,
   ...)
 
-\method{clean}{lvm.reduced}(x, rm.exo = TRUE, rm.lp = TRUE,
-  simplify.reduce = TRUE, simplify, ...)
+lava.reduce.clean.hook(x, rm.exo, rm.lp = TRUE, simplify.reduce = TRUE,
+  simplify, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}

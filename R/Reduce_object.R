@@ -82,7 +82,7 @@ lvm2reduce <- function(x){
 #' coef(rm)
 #' 
 #' coef(reduce(m))
-#' reduce(m, rm.exo = FALSE)
+#' reduce(m, rm.exo = TRUE)
 #' 
 #' reduce(m, link = paste0("y~x",1:5))
 #' 
@@ -96,7 +96,7 @@ lvm2reduce <- function(x){
 #' rm <- reduce(m)
 #' )
 #' coef(rm)
-#' reduce(m, rm.exo = FALSE)
+#' reduce(m, rm.exo = TRUE)
 #'
 #' @export
 `reduce` <-

@@ -38,15 +38,17 @@
 # {{{ reduce.remove.hook
 #' @rdname killLP
 #' @export
-lvmReduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
+lava.reduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
                                 ...){
 
       ## lvm object with linear predictor
     if("lvm.reduced" %in% class(x)){
+        
         ## remove linear predictors
         if(any(var %in% lp(x))){
             lp.rm <- var[var %in% lp(x)]
-            x <- cancel(x, value = lp(x, lp = lp.rm, type = "link"), expar = expar, restaure = restaure, clean = FALSE)    
+            x <- cancel(x, value = lp(x, lp = lp.rm, type = "link"),
+                        expar = expar, restaure = restaure, clean = FALSE)    
         }
            
         ## remove variables in the linear predictor
@@ -70,79 +72,59 @@ lvmReduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
 
 # }}}
 
-# {{{ cancel.lvm.reduce
+# {{{ lava.reduce.cancel.hook
 #' @name killLP
 #' @export
-cancel.lvm.reduced  <- function(x, value, expar = TRUE, restaure = FALSE,
-                                ...){
+lava.reduce.cancel.hook  <- function(x, value,
+                                     expar = TRUE, restaure = FALSE, ...){
 
-    ## normalize value
-    allCoef <- initVar_links(value, format = "txt.formula")
-    
-    ## order by linear predictor  
-    if(any(allCoef %in% coef(x) == FALSE)){
-        stop("unknown link: \"",paste(allCoef[allCoef %in% coef(x) == FALSE], collapse = "\" \""),"\" \n",
-             "possible link: \"",paste(coef(x)[coef(x) %in%allCoef == FALSE], collapse = "\" \""),"\" \n")
-    }
-  
-    allCoef.lp <- intersect(allCoef, lp(x, "link"))
-    allCoef.nlp <- setdiff(allCoef, lp(x, "link"))
-  
-    ## compatibility with lava: links outside the linear predictor
-    if(length(allCoef.nlp)>0){
-        list.nlp <- initVar_links(allCoef.nlp, format = "list")
-        
-        ## not working because cancel.lvm calls cancel
-        # f.nlp <- combine.formula(allCoef.nlp)
-        for(iterF in 1:length(list.nlp$var2)){
-            #   x <- callS3methodParent(x, FUN = "cancel", class = "lvm.reduced", 
-            #                           value = f.nlp[[iterF]])Q
-            x <- callS3methodParent(x, FUN = "cancel", class = "lvm.reduced", 
-                                    value = c(list.nlp$var1[iterF],list.nlp$var2[iterF]))
+    if("lvm.reduced" %in% class(x)){
+
+        ## normalize value        
+        if(is.character(value) && all(value %in% vars(x,lp=TRUE,xlp=TRUE))){
+            ## arguments coming from cancel.lvm
+            allCoef <- initVar_link(value[1],value[2], format = "txt.formula")
+        }else{
+            ## argument coming from lava.reduce.remove.hook
+            allCoef <- initVar_links(value, format = "txt.formula")
         }
         
-    }
-  
-    ## coefficients in LP
-    if(length(allCoef.lp)>0){
-        linkLP <- lp(x, type = "link", format = "list")        
-        name.lp <- lp(x, type = "name")        
+        ## coefficients in LP
+        allCoef.lp <- intersect(allCoef, lp(x, "link"))
+        if(length(allCoef.lp)>0){
+            linkLP <- lp(x, type = "link", format = "list")        
+            name.lp <- lp(x, type = "name")        
 
-        for(iterLP in 1:length(linkLP)){ # iterLP <- 1
-            iCoef.lp <- allCoef.lp[allCoef.lp %in% linkLP[[iterLP]]]
-            if(length(iCoef.lp)==0){next} 
+            for(iterLP in 1:length(linkLP)){ # iterLP <- 1
+                iCoef.lp <- allCoef.lp[allCoef.lp %in% linkLP[[iterLP]]]
+                if(length(iCoef.lp)==0){next} 
             
-            ## remove external parameters from the LVM 
-            if(expar){
-                parameter(x, remove = TRUE) <- unlist(iCoef.lp) #must be a character
-                # x$expar <- x$expar[setdiff(names(x$expar),coefLP)]
-                # x$exfix <- x$exfix[setdiff(names(x$exfix),coefLP)]
-                # if(length(x$exfix)==0){x$exfix <- NULL}
-                # x$attributes$parameter <- x$attributes$parameter[setdiff(names(x$attributes$parameter),coefLP)]
-                # x$index$npar.ex <- x$index$npar.ex[setdiff(names(x$index$npar.ex),coefLP)]
-                # x$index$parval <- x$index$parval[setdiff(names(x$index$parval),coefLP)]
-            }
+                ## remove external parameters from the LVM 
+                if(expar){
+                    parameter(x, remove = TRUE) <- unlist(iCoef.lp) #must be a character
+                }
       
-            newlp <- lp(x, type = c("x","con","name","link"), lp = name.lp[iterLP], format = "list2")
-            newlp.link <- newlp[[1]]$link
-            newlp.x <- newlp[[1]]$x
+                newlp <- lp(x, type = c("x","con","name","link"), lp = name.lp[iterLP], format = "list2")
+                newlp.link <- newlp[[1]]$link
+                newlp.x <- newlp[[1]]$x
       
-            indexRM <- which(newlp.link %in% iCoef.lp)
+                indexRM <- which(newlp.link %in% iCoef.lp)
 
-            ## restaure the links removed from the lp in the lvm
-            if(restaure){
-                f <- as.formula(paste( lp(x, type = "endo", lp = iterLP), "~",  paste(newlp.x[indexRM], collapse = " + ") ) )
-                regression(x) <- f
+                ## restaure the links removed from the lp in the lvm               
+                if(restaure){                   
+                    f <- as.formula(paste( lp(x, type = "endo", lp = iterLP), "~",  paste(newlp.x[indexRM], collapse = " + ") ) )
+                    regression(x) <- f
+                }
+      
+                newlp[[1]]$link <- NULL # link is not part of the lp object. It has been constructed by the lp() extractor so it should be removed for updating using lp<-
+                newlp[[1]]$con <- newlp[[1]]$con[-indexRM]
+                newlp[[1]]$x <- newlp[[1]]$x[-indexRM]
+      
+                lp(x, lp = name.lp[iterLP]) <- newlp      
             }
-      
-            newlp[[1]]$link <- NULL # link is not part of the lp object. It has been constructed by the lp() extractor so it should be removed for updating using lp<-
-            newlp[[1]]$con <- newlp[[1]]$con[-indexRM]
-            newlp[[1]]$x <- newlp[[1]]$x[-indexRM]
-      
-            lp(x, lp = name.lp[iterLP]) <- newlp      
         }
     }
-  
+    
     return(x)
 }
 # }}}

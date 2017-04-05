@@ -5,7 +5,7 @@
 ## Version: 
 ## last-updated: apr  4 2017 (09:28) 
 ##           By: Brice Ozenne
-##     Update #: 68
+##     Update #: 87
 #----------------------------------------------------------------------
 ## 
 ### Commentary: 
@@ -62,6 +62,14 @@
 #' @export
 clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
 
+    myhooks <- gethook_lava.reduce("clean.hooks")
+    for (f in myhooks) {
+        res <- do.call(f, list(x=x, rm.exo=rm.exo,...))
+        if("x" %in% names(res)){ x <- res$x }
+        if("rm.exo" %in% names(res)){ rm.exo <- res$rm.exo }
+        if("rm.endo" %in% names(res)){ rm.endo <- res$rm.endo }
+    }  
+    
     var.latent <- latent(x)
     var.exogenous <- exogenous(x)
     var.endogenous <- endogenous(x)
@@ -99,47 +107,54 @@ clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
 }
 # }}}
 
-# {{{ clean.lvm.reduced
+# {{{ lava.reduce.clean.hook
 #' @rdname clean
 #' @export
-clean.lvm.reduced <- function(x, rm.exo = TRUE, rm.lp = TRUE,
-                              simplify.reduce = TRUE, simplify, ...){
+lava.reduce.clean.hook <- function(x, rm.exo,
+                                   rm.lp = TRUE, simplify.reduce = TRUE, simplify, ...){
 
-     if(!missing(simplify)){
-        simplify.reduce <- simplify
-    }
-
-    n.link <- lp(x, type = "n.link")
-    
-    if(rm.lp && any(n.link==0)){ ## remove empty lp
-        name.lp <- names(n.link)[which(n.link==0)]
-        x <- callS3methodParent(x, FUN = "kill", class = "lvm.reduced", value = name.lp)
-        x$lp[lp(x, lp = name.lp, type = "endo")] <- NULL
-    }
-
-    if(simplify.reduce && length(lp(x, type = "link", format = "vector")) == 0 ){
-        
-        class(x) <- setdiff(class(x), "lvm.reduced")        
-        return(clean(x, simplify = simplify, ...))
-        
-    }else{
-        ## need to rm exo here to account for lp and not in clean.lvm
-        var.exogenous <- exogenous(x)
-        M.reg <- x$index$A
-        M.cov <- x$index$P - diag(diag(x$index$P))
-        
-        if(rm.exo && length(var.exogenous) > 0){
-            indexClean.reg <- which(rowSums(M.reg[var.exogenous,,drop = FALSE]!=0)==0)
-            indexClean.cov <- which(rowSums(M.cov[var.exogenous,,drop = FALSE]!=0)==0)
-            indexClean.lp <- which(var.exogenous %in% lp(x, type = "x") == FALSE)
-            indexClean <- intersect(indexClean.reg, intersect(indexClean.cov, indexClean.lp))
-            if(length(indexClean)>0){
-                x <- kill(x, value =  var.exogenous[indexClean])
-            }
+    if("lvm.reduced" %in% class(x)){
+        if(!missing(simplify)){
+            simplify.reduce <- simplify
         }
+
+        ## remove empty lp
+        n.link <- lp(x, type = "n.link")
+        if(rm.lp && any(n.link==0)){ 
+            name.lp <- names(n.link)[which(n.link==0)]
+            x <- kill(x, value = name.lp)
+            x$lp[lp(x, lp = name.lp, type = "endo")] <- NULL
+        }
+
+        ## remove useless exogeneous variables
+        if(length(lp(x, type = "link", format = "vector")) == 0 ){
+            ## lvm.reduced object with no linear predictor
+            if(simplify.reduce){
+                class(x) <- setdiff(class(x), "lvm.reduced")
+            }
+        }else{
+            ## lvm.reduced object with linear predictors
+            var.exogenous <- exogenous(x)
+            M.reg <- x$index$A
+            M.cov <- x$index$P - diag(diag(x$index$P))
+
+            if(rm.exo && length(var.exogenous) > 0){
+                indexClean.reg <- which(rowSums(M.reg[var.exogenous,,drop = FALSE]!=0)==0)
+                indexClean.cov <- which(rowSums(M.cov[var.exogenous,,drop = FALSE]!=0)==0)
+                indexClean.lp <- which(var.exogenous %in% lp(x, type = "x") == FALSE)
+                indexClean <- intersect(indexClean.reg, intersect(indexClean.cov, indexClean.lp))
+                if(length(indexClean)>0){
+                    x <- kill(x, value =  var.exogenous[indexClean])
+                }
+            }
+
+            rm.exo <- FALSE
          
-        return(callS3methodParent(x, FUN = "clean", class = "lvm.reduced", simplify = simplify, rm.exo = FALSE, ...))    
+        }
     }
+
+    return(list(x=x,
+                rm.exo=rm.exo))
 
 }
 # }}}

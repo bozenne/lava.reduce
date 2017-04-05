@@ -2,7 +2,7 @@ Package: lava.reduce
 Type: Package
 Title: Latent Variable Models with linear predictor
 Version: 0.2
-Date: 2017-03-23
+Date: 2017-04-05
 Author: Brice Ozenne[aut, cre]
 Maintainer: brice ozenne <brice.ozenne@orange.fr>
 Description: Latent variable models with linear predictors. Should enable a faster optimisation when dealing with a large number of variables.

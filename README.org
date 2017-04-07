@@ -23,9 +23,6 @@ df.data <- sim(m, 1e2)
 
 #+RESULTS:
 #+begin_example
-Loading required package: lava
-lava version 1.5.1
-lava.reduce version 0.2
 Latent Variable Model
                                                 
   y1 ~ x1+x2+x3+x4+x5+x6+x7+x8+x9+x10   gaussian
@@ -125,7 +122,6 @@ Then we can estimate the model:
 : -0.13074998 -0.01754805  0.85586891  1.05513881  0.54344053  0.93672592  1.00944399  1.07045250  0.99182468  0.92266665  1.07494053  1.06341229  1.00513021  0.90690769  0.91347176 
 :       y2~z1       y2~z2       y2~z3       y2~z4       y2~z5       y2~z6       y2~z7       y2~z8       y2~z9      y2~z10 
 :  0.96586425  0.89987012  0.90914748  1.04065111  0.97182091  1.03423191  1.15779342  0.95841344  0.96804614  1.00299685
-
 
 and check that the estimates match with the one of the standard =lvm=
 #+BEGIN_SRC R :exports both :results output

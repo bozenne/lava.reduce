@@ -1,6 +1,6 @@
 #' @title Remove variables from linear predictors
 #' @description Remove one or several variable from the linear predictors
-#' @name killLP
+#' @name kill.lp
 #' 
 #' @param x \code{lvm}-object
 #' @param var the names of the variables that should be removed
@@ -36,7 +36,7 @@
 #' # see test/testthat/test-cancel.R
 
 # {{{ reduce.remove.hook
-#' @rdname killLP
+#' @rdname kill.lp
 #' @export
 lava.reduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
                                 ...){
@@ -73,7 +73,7 @@ lava.reduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
 # }}}
 
 # {{{ lava.reduce.cancel.hook
-#' @name killLP
+#' @name kill.lp
 #' @export
 lava.reduce.cancel.hook  <- function(x, value,
                                      expar = TRUE, restaure = FALSE, ...){

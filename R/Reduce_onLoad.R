@@ -1,5 +1,6 @@
 lava.reduce.env <- new.env()
 assign("clean.hooks",c(),envir=lava.reduce.env)
+assign("reduce.hooks",c(),envir=lava.reduce.env)
 
 '.onLoad' <- function(lib, pkg="lava.reduce") {
  
@@ -22,10 +23,23 @@ assign("clean.hooks",c(),envir=lava.reduce.env)
 
 procdata.lvm <- get("procdata.lvm", envir = asNamespace("lava"), inherits = FALSE)
 
+
+#' @title Hooks for lava reduce
+#' @description Get and add hook for lava reduce
+#' @name hook.reduce
+#'
+#' @param x the function to add to the hook
+#' @param hook the name of the hook
+#' 
+
+#' @rdname hook.reduce
+#' @export
 gethook_lava.reduce<- function (hook, ...){
     get(hook, envir = lava.reduce.env)
 }
 
+#' @rdname hook.reduce
+#' @export
 addhook_lava.reduce <- function (x, hook, ...){
     newhooks <- unique(c(gethook_lava.reduce(hook), x))
     assign(hook, newhooks, envir = lava.reduce.env)

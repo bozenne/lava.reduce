@@ -1,4 +1,3 @@
-
 # {{{ intialisation
 
 #' @title Initialize a linear predictor
@@ -37,7 +36,8 @@ lvm.reduced <- function(...){
 #' @description Add the possibility to use linear predictor in a latent variable model
 #' 
 #' @param x \code{lvm}-object
-#' 
+#'
+#' @export
 lvm2reduce <- function(x){
   
   if("lvm.reduced" %in% class(x) == FALSE){
@@ -108,6 +108,13 @@ lvm2reduce <- function(x){
 #' @export
 reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
 
+   myhooks <- gethook_lava.reduce("reduce.hooks")
+   for (f in myhooks) {
+       res <- do.call(f, list(x=x, link = link, ...))
+       if("x" %in% names(res)){x <- res$x}
+       if("link" %in% names(res)){link <- res$link}
+   }
+    
   if(is.null(link)){ # reduce the linear predictor of specific endogeneous variables
   
     if(is.null(endo)){endo <- lava::endogenous(x)}
@@ -134,9 +141,9 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
     
   }
   
-  #### define the links
-  # can be problematic as we don't know about "additive" or other possibly relevant arguments
-  ls.link <- combine.formula(link)
+    #### define the links
+    # can be problematic as we don't know about "additive" or other possibly relevant arguments
+    ls.link <- combine.formula(link)
   
     #### reduce
     n.endo <- length(ls.link)
@@ -144,11 +151,14 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
         x <- lvm2reduce(x)
     }
 
-    for(iterR in 1:n.endo){# iterR <- 1
+    x.class <- class(x)
+    class(x) <- c("lvm.reduced","lvm")    
+    for(iterR in 1:n.endo){# iterR <- 1        
         cancel(x) <- ls.link[[iterR]]
         regression(x, reduce = TRUE) <- ls.link[[iterR]]
-
     }
+    class(x) <- x.class
+
     if(clean){
         x <- clean(x, ...)
     }

@@ -15,7 +15,6 @@ test_that("reduce twice",{
   expect_equal( reduce(m.red) , m.red )
 })
 
-
 iter.max <- 1
 
 context("#### Regression #### \n")

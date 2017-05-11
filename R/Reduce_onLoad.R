@@ -30,7 +30,7 @@ procdata.lvm <- get("procdata.lvm", envir = asNamespace("lava"), inherits = FALS
 #'
 #' @param x the function to add to the hook
 #' @param hook the name of the hook
-#' 
+#' @param ... for compatibility with lava
 
 #' @rdname hook.reduce
 #' @export

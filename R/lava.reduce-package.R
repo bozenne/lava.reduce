@@ -7,7 +7,7 @@
 #' @importFrom numDeriv jacobian
 #' @importFrom stats as.formula coef delete.response predict setNames terms
 #' @importFrom utils getS3method
-#' @useDynLib lava.reduce
+#' @useDynLib lava.reduce, .registration=TRUE
 NULL
 
 

@@ -13,6 +13,8 @@ addhook_lava.reduce(x, hook, ...)
 \arguments{
 \item{hook}{the name of the hook}
 
+\item{...}{for compatibility with lava}
+
 \item{x}{the function to add to the hook}
 }
 \description{

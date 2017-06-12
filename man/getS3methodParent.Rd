@@ -26,4 +26,3 @@ getS3methodParent(m, "coef")
 getS3methodParent(m, "coef", value = TRUE)
 
 }
-

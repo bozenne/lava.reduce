@@ -24,4 +24,3 @@ callS3methodParent(m, "coef")
 callS3methodParent(m, FUN = "coef", class = "lvm.reduced")
 
 }
-

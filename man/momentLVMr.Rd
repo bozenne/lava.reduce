@@ -2,25 +2,25 @@
 % Please edit documentation in R/Reduce_moment.R
 \docType{data}
 \name{momentLVMr}
-\alias{gaussian1LP_gradient.lvm}
-\alias{gaussian1LP_hessian.lvm}
-\alias{gaussian1LP_logLik.lvm}
-\alias{gaussian1LP_method.lvm}
-\alias{gaussian1LP_objective.lvm}
-\alias{gaussian1LP_score.lvm}
-\alias{gaussian2LP_gradient.lvm}
-\alias{gaussian2LP_hessian.lvm}
-\alias{gaussian2LP_logLik.lvm}
-\alias{gaussian2LP_method.lvm}
-\alias{gaussian2LP_objective.lvm}
-\alias{gaussian2LP_score.lvm}
-\alias{gaussianLP_gradient.lvm}
-\alias{gaussianLP_hessian.lvm}
-\alias{gaussianLP_logLik.lvm}
+\alias{momentLVMr}
 \alias{gaussianLP_method.lvm}
 \alias{gaussianLP_objective.lvm}
+\alias{gaussianLP_logLik.lvm}
+\alias{gaussianLP_gradient.lvm}
 \alias{gaussianLP_score.lvm}
-\alias{momentLVMr}
+\alias{gaussianLP_hessian.lvm}
+\alias{gaussian1LP_method.lvm}
+\alias{gaussian1LP_logLik.lvm}
+\alias{gaussian1LP_objective.lvm}
+\alias{gaussian1LP_score.lvm}
+\alias{gaussian1LP_gradient.lvm}
+\alias{gaussian1LP_hessian.lvm}
+\alias{gaussian2LP_method.lvm}
+\alias{gaussian2LP_logLik.lvm}
+\alias{gaussian2LP_objective.lvm}
+\alias{gaussian2LP_score.lvm}
+\alias{gaussian2LP_gradient.lvm}
+\alias{gaussian2LP_hessian.lvm}
 \title{Moments for a reduced lvm model}
 \format{An object of class \code{character} of length 1.}
 \usage{
@@ -84,4 +84,3 @@ Compute the likelihood, score and hessian of a reduced lvm model
 this function assumes that the external parameters in p are at the end of the vector
 }
 \keyword{datasets}
-

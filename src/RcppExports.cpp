@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // scoreLVM
 arma::mat scoreLVM(arma::mat data, const arma::vec& p, const arma::mat& mu, const SEXP& dmu, const arma::mat& S, const SEXP& dS, const std::vector<IntegerVector >& indexCoef, const std::vector<IntegerVector >& indexEndo, const IntegerVector& indexIntercept, const IntegerVector& indexLP, const IntegerVector& indexManifest, bool indiv);
-RcppExport SEXP lava_reduce_scoreLVM(SEXP dataSEXP, SEXP pSEXP, SEXP muSEXP, SEXP dmuSEXP, SEXP SSEXP, SEXP dSSEXP, SEXP indexCoefSEXP, SEXP indexEndoSEXP, SEXP indexInterceptSEXP, SEXP indexLPSEXP, SEXP indexManifestSEXP, SEXP indivSEXP) {
+RcppExport SEXP lavaReduce_scoreLVM(SEXP dataSEXP, SEXP pSEXP, SEXP muSEXP, SEXP dmuSEXP, SEXP SSEXP, SEXP dSSEXP, SEXP indexCoefSEXP, SEXP indexEndoSEXP, SEXP indexInterceptSEXP, SEXP indexLPSEXP, SEXP indexManifestSEXP, SEXP indivSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;

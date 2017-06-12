@@ -1,15 +1,15 @@
 #+BEGIN_HTML
-<a href="https://travis-ci.org/bozenne/lava.reduce"><img src="https://travis-ci.org/bozenne/lava.reduce.svg?branch=master"></a>
+<a href="https://travis-ci.org/bozenne/lavaReduce"><img src="https://travis-ci.org/bozenne/lavaReduce.svg?branch=master"></a>
 #+END_HTML
 
-* lava.reduce
+* lavaReduce
 
 
 ** example
 
 First define a standard =lvm= model:
 #+BEGIN_SRC R :exports both :results output
-library(lava.reduce)
+library(lavaReduce)
 
 m <- lvm()
 m <- regression(m, x=paste0("x",1:10),y="y1")
@@ -138,7 +138,7 @@ and check that the estimates match with the one of the standard =lvm=
 ** all functions
 
 #+BEGIN_SRC R :exports both :results output
-  ls(getNamespace("lava.reduce"), all.names=TRUE)
+  ls(getNamespace("lavaReduce"), all.names=TRUE)
 #+END_SRC
 
  [1] ".__DEVTOOLS__"             ".__NAMESPACE__."           ".__S3MethodsTable__."      ".onAttach"                 ".onLoad"                   ".packageName"              "calcLP"                   
@@ -146,13 +146,13 @@ and check that the estimates match with the one of the standard =lvm=
 [15] "endogenous.lvm.reduced"    "estimate.lvm.reduced"      "exogenous.lvm.reduced"     "formula2character"         "gaussian1LP_gradient.lvm"  "gaussian1LP_hessian.lvm"   "gaussian1LP_logLik.lvm"   
 [22] "gaussian1LP_method.lvm"    "gaussian1LP_objective.lvm" "gaussian1LP_score.lvm"     "gaussian2LP_gradient.lvm"  "gaussian2LP_hessian.lvm"   "gaussian2LP_logLik.lvm"    "gaussian2LP_method.lvm"   
 [29] "gaussian2LP_objective.lvm" "gaussian2LP_score.lvm"     "gaussianLP_gradient.lvm"   "gaussianLP_hessian.lvm"    "gaussianLP_logLik.lvm"     "gaussianLP_method.lvm"     "gaussianLP_objective.lvm" 
-[36] "gaussianLP_score.lvm"      "getS3methodParent"         "initializer.lava.reduce"   "initLP"                    "initVar_link"              "initVar_links"             "kill.lvm.reduced"         
-[43] "latent<-.lvm.reduced"      "lava.reduce.estimate.hook" "lava.reduce.post.hook"     "lp"                        "lp.lvm.reduced"            "lp<-"                      "lp<-.lvm.reduced"         
+[36] "gaussianLP_score.lvm"      "getS3methodParent"         "initializer.lavaReduce"   "initLP"                    "initVar_link"              "initVar_links"             "kill.lvm.reduced"         
+[43] "latent<-.lvm.reduced"      "lavaReduce.estimate.hook" "lavaReduce.post.hook"     "lp"                        "lp.lvm.reduced"            "lp<-"                      "lp<-.lvm.reduced"         
 [50] "lvm.reduced"               "lvm2reduce"                "manifest.lvm.reduced"      "procdata.lvm"              "reduce"                    "reduce.lvm"                "regression.lvm.reduced"   
 [57] "regression<-.lvm.reduced"  "scoreLVM"                  "select.regressor"          "select.regressor.formula"  "select.response"           "select.response.formula"   "vars.lvm.reduced"         
 
 
-#+TITLE: Plugin for =lava= allowing LVM with linear predictors (=lava.reduce=)
+#+TITLE: Plugin for =lava= allowing LVM with linear predictors (=lavaReduce=)
 #+AUTHOR: Brice Ozenne
 #+PROPERTY: header-args:R  :session *R* :cache no :width 550 :height 450
 #+PROPERTY: header-args  :eval never-export :exports results :results output :tangle yes :comments yes 

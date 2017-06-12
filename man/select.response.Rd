@@ -29,4 +29,3 @@ select.response(Y1+Y2~X1+Y1, type = "vars")
 select.response(~X1+X2)
 select.response(~X1+X2, type = "vars")
 }
-

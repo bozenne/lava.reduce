@@ -2,6 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 scoreLVM <- function(data, p, mu, dmu, S, dS, indexCoef, indexEndo, indexIntercept, indexLP, indexManifest, indiv) {
-    .Call('lava_reduce_scoreLVM', PACKAGE = 'lava.reduce', data, p, mu, dmu, S, dS, indexCoef, indexEndo, indexIntercept, indexLP, indexManifest, indiv)
+    .Call(lavaReduce_scoreLVM, data, p, mu, dmu, S, dS, indexCoef, indexEndo, indexIntercept, indexLP, indexManifest, indiv)
 }
 

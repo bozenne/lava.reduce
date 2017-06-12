@@ -38,7 +38,7 @@
 # {{{ reduce.remove.hook
 #' @rdname kill.lp
 #' @export
-lava.reduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
+lavaReduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
                                 ...){
 
       ## lvm object with linear predictor
@@ -72,10 +72,10 @@ lava.reduce.remove.hook  <- function(x, var, expar = TRUE, restaure = FALSE,
 
 # }}}
 
-# {{{ lava.reduce.cancel.hook
+# {{{ lavaReduce.cancel.hook
 #' @name kill.lp
 #' @export
-lava.reduce.cancel.hook  <- function(x, value,
+lavaReduce.cancel.hook  <- function(x, value,
                                      expar = TRUE, restaure = FALSE, ...){
 
     if("lvm.reduced" %in% class(x)){
@@ -85,7 +85,7 @@ lava.reduce.cancel.hook  <- function(x, value,
             ## arguments coming from cancel.lvm
             allCoef <- initVar_link(value[1],value[2], format = "txt.formula")
         }else{
-            ## argument coming from lava.reduce.remove.hook
+            ## argument coming from lavaReduce.remove.hook
             allCoef <- initVar_links(value, format = "txt.formula")
         }
         

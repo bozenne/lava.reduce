@@ -68,4 +68,3 @@ emR <- estimate(mR1, data = d)
 coef(em)
 coef(emR)[names(coef(em))]
 }
-

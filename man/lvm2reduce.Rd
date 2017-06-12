@@ -12,4 +12,3 @@ lvm2reduce(x)
 \description{
 Add the possibility to use linear predictor in a latent variable model
 }
-

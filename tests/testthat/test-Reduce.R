@@ -1,8 +1,8 @@
 # library(testthat)
-# library(lava.reduce)
-# butils.base::package.source("lava.reduce", Rcode = TRUE, RorderDescription = FALSE)
+# library(lavaReduce)
+# butils.base::package.source("lavaReduce", Rcode = TRUE, RorderDescription = FALSE)
 
-gaussian1LP_gradient.lvm <- lava.reduce:::gaussian1LP_gradient.lvm
+gaussian1LP_gradient.lvm <- lavaReduce:::gaussian1LP_gradient.lvm
   
 context("#### Reduce #### \n")
 lava.options(symbols = c(";","<->"))
@@ -46,12 +46,12 @@ test_that("Regression: moment reduce", {
   g2 <- lava:::gaussian1_gradient.lvm(x = m, data=d, p=start, S = e$S, n = e$data$n, mu = e$mu)
   expect_equal(unname(g1), g2[index])
 
-  # gaussianLP_logLik.lvm <- lava.reduce:::gaussianLP_logLik.lvm
-  # gaussianLP_gradient.lvm <- lava.reduce:::gaussianLP_gradient.lvm
-  # gaussianLP_score.lvm <- lava.reduce:::gaussianLP_score.lvm
-  # gaussianLP_hessian.lvm <- lava.reduce:::gaussianLP_hessian.lvm
-  # gaussian1LP_hessian.lvm <- lava.reduce:::gaussian1LP_hessian.lvm
-  # gaussian2LP_hessian.lvm <- lava.reduce:::gaussian2LP_hessian.lvm
+  # gaussianLP_logLik.lvm <- lavaReduce:::gaussianLP_logLik.lvm
+  # gaussianLP_gradient.lvm <- lavaReduce:::gaussianLP_gradient.lvm
+  # gaussianLP_score.lvm <- lavaReduce:::gaussianLP_score.lvm
+  # gaussianLP_hessian.lvm <- lavaReduce:::gaussianLP_hessian.lvm
+  # gaussian1LP_hessian.lvm <- lavaReduce:::gaussian1LP_hessian.lvm
+  # gaussian2LP_hessian.lvm <- lavaReduce:::gaussian2LP_hessian.lvm
   # 
   # checkMoment(m.red, e) # the data must be converted to matrix + add LP
     

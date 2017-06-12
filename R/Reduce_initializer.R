@@ -9,10 +9,10 @@
 #' 
 # }}}
 
-# {{{ initializer.lava.reduce
+# {{{ initializer.lavaReduce
 #' @rdname initializer
 #' @export
-initializer.lava.reduce <- function(x, data, optim, ...){
+initializer.lavaReduce <- function(x, data, optim, ...){
   
   ## compute moment
   dd <- procdata.lvm(x, data = data) # callS3methodParent(x, FUN = "procdata", class = "lvm.reduced", data = data)

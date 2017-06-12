@@ -1,9 +1,9 @@
-# setwd(file.path(butils:::path_gitHub(),"lava.reduce","tests"))
+# setwd(file.path(butils:::path_gitHub(),"lavaReduce","tests"))
 
 
-library("lava.reduce")
+library("lavaReduce")
 suppressPackageStartupMessages(library("testthat"))
 source("FCT.R")
-test_check("lava.reduce")
+test_check("lavaReduce")
 
 

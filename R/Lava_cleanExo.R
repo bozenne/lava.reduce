@@ -30,7 +30,7 @@
 #' @param ... additional arguments to lower level functions
 #'
 #' @details
-#' simplify means remove the class \code{"lava.reduce"} if no linear predictor is in the object.
+#' simplify means remove the class \code{"lavaReduce"} if no linear predictor is in the object.
 #' 
 #' @examples 
 #' 
@@ -62,7 +62,7 @@
 #' @export
 clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
 
-    myhooks <- gethook_lava.reduce("clean.hooks")
+    myhooks <- gethook_lavaReduce("clean.hooks")
     for (f in myhooks) {
         res <- do.call(f, list(x=x, rm.exo=rm.exo,...))
         if("x" %in% names(res)){ x <- res$x }
@@ -107,10 +107,10 @@ clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
 }
 # }}}
 
-# {{{ lava.reduce.clean.hook
+# {{{ lavaReduce.clean.hook
 #' @rdname clean
 #' @export
-lava.reduce.clean.hook <- function(x, rm.exo,
+lavaReduce.clean.hook <- function(x, rm.exo,
                                    rm.lp = TRUE, simplify.reduce = TRUE, simplify, ...){
 
     if("lvm.reduced" %in% class(x)){

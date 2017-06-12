@@ -1,8 +1,8 @@
 # library(butils.base)
-# package.source("lava.reduce")
+# package.source("lavaReduce")
 
 # library(testthat)
-# library(lava.reduce)
+# library(lavaReduce)
 # library(lava)
 
 context("#### destructors #### \n")

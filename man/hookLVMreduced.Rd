@@ -2,13 +2,13 @@
 % Please edit documentation in R/Reduce_hook.R
 \name{hookLVMreduced}
 \alias{hookLVMreduced}
-\alias{lava.reduce.estimate.hook}
-\alias{lava.reduce.post.hook}
+\alias{lavaReduce.estimate.hook}
+\alias{lavaReduce.post.hook}
 \title{Hook for \code{lvm.reduced} objects}
 \usage{
-lava.reduce.estimate.hook(x, data, estimator, ...)
+lavaReduce.estimate.hook(x, data, estimator, ...)
 
-lava.reduce.post.hook(x)
+lavaReduce.post.hook(x)
 }
 \arguments{
 \item{x}{\code{lvm.reduced}-object}
@@ -22,4 +22,3 @@ lava.reduce.post.hook(x)
 \description{
 Pre and post processing methods
 }
-

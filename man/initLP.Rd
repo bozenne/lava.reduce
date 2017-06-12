@@ -9,4 +9,3 @@ initLP()
 \description{
 Initialise a linear predictor
 }
-

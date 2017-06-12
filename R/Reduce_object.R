@@ -108,7 +108,7 @@ lvm2reduce <- function(x){
 #' @export
 reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
 
-   myhooks <- gethook_lava.reduce("reduce.hooks")
+   myhooks <- gethook_lavaReduce("reduce.hooks")
    for (f in myhooks) {
        res <- do.call(f, list(x=x, link = link, ...))
        if("x" %in% names(res)){x <- res$x}

@@ -1,10 +1,10 @@
 library(testthat)
-# library(lava.reduce)
+# library(lavaReduce)
 # library(lava)
 
 context("#### initVar #### \n")
 
-initVar_link <-  lava.reduce:::initVar_link
+initVar_link <-  lavaReduce:::initVar_link
 
 lava.options(symbols = c("~","~~"))
 

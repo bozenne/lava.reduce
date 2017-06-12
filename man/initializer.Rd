@@ -2,10 +2,10 @@
 % Please edit documentation in R/Reduce_initializer.R
 \name{initializer}
 \alias{initializer}
-\alias{initializer.lava.reduce}
+\alias{initializer.lavaReduce}
 \title{Initialise \code{lvm.reduced}}
 \usage{
-initializer.lava.reduce(x, data, optim, ...)
+initializer.lavaReduce(x, data, optim, ...)
 }
 \arguments{
 \item{x}{\code{lvm.reduced}-object}
@@ -19,4 +19,3 @@ initializer.lava.reduce(x, data, optim, ...)
 \description{
 Estimate initial values for the parameters contained in a \code{lvm.reduced} object
 }
-

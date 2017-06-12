@@ -31,4 +31,3 @@ lava.options(symbols = c("~","~~"))
 combine.formula(list("Y~X1","Y~X3","Y1~X2"))
 
 }
-

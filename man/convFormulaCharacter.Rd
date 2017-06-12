@@ -19,4 +19,3 @@ Conversion of formula into character string or vice versa
 formula2character(Y1~X1+X2)
 formula2character(Y1~X1+X2, type = "symbols")
 }
-

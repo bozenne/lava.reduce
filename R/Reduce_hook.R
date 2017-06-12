@@ -7,7 +7,7 @@
 #' @param ... additional arguments to be passed to the low level functions
 #' 
 #' @export
-lava.reduce.estimate.hook <- function(x,data,estimator,...) {
+lavaReduce.estimate.hook <- function(x,data,estimator,...) {
 
     dots <- list(...)
   if("lvm.reduced" %in% class(x) && length(lp(x))>0){
@@ -35,7 +35,7 @@ lava.reduce.estimate.hook <- function(x,data,estimator,...) {
           x0 <- kill(x, value = lp(x), restaure = TRUE) # remove LP and external parameters
           x0 <- clean(x0)
 		
-          startLVM <- initializer.lava.reduce(x0, data = data, optim = dots$optim)
+          startLVM <- initializer.lavaReduce(x0, data = data, optim = dots$optim)
         
         ## update
         dots$optim$start <- stats::setNames(rep(0, length = length(coef(x))), coef(x))
@@ -63,7 +63,7 @@ lava.reduce.estimate.hook <- function(x,data,estimator,...) {
 
 #' @rdname hookLVMreduced
 #' @export
-lava.reduce.post.hook <- function(x){
+lavaReduce.post.hook <- function(x){
   
   return(x)
   

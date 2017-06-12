@@ -2,8 +2,8 @@
 % Please edit documentation in R/Reduce_regression.R
 \name{regression}
 \alias{regression}
-\alias{regression.lvm.reduced}
 \alias{regression<-.lvm.reduced}
+\alias{regression.lvm.reduced}
 \title{Add regression association to a latent variable model with linear predictor}
 \usage{
 \method{regression}{lvm.reduced}(object = lvm.reduced(), ...) <- value
@@ -48,4 +48,3 @@ regression(m, reduce = "LL") <- y1 ~ x5 + x6 + x7
 m
 
 }
-

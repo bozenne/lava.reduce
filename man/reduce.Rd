@@ -56,4 +56,3 @@ coef(rm)
 reduce(m, rm.exo = TRUE)
 
 }
-

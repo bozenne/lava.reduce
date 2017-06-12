@@ -20,4 +20,3 @@ calcLP(data, p, lp.x, lp.link, lp.name)
 \description{
 Compute the value of the linear predictors of a LVM and store it into the dataset
 }
-

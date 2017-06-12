@@ -16,4 +16,3 @@
 \description{
 Same as latent for latent variable model but check the consistency of the object
 }
-

@@ -2,13 +2,14 @@
 % Please edit documentation in R/Reduce_kill.R
 \name{kill.lp}
 \alias{kill.lp}
-\alias{lava.reduce.cancel.hook}
-\alias{lava.reduce.remove.hook}
+\alias{lavaReduce.remove.hook}
+\alias{kill.lp}
+\alias{lavaReduce.cancel.hook}
 \title{Remove variables from linear predictors}
 \usage{
-lava.reduce.remove.hook(x, var, expar = TRUE, restaure = FALSE, ...)
+lavaReduce.remove.hook(x, var, expar = TRUE, restaure = FALSE, ...)
 
-lava.reduce.cancel.hook(x, value, expar = TRUE, restaure = FALSE, ...)
+lavaReduce.cancel.hook(x, value, expar = TRUE, restaure = FALSE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}
@@ -52,4 +53,3 @@ coef(m)
 
 # see test/testthat/test-cancel.R
 }
-

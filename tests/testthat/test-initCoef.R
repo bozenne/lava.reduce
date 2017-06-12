@@ -1,5 +1,5 @@
 # library(testthat)
-# library(lava.reduce)
+# library(lavaReduce)
 # library(lava)
 
 context("#### initCoef - regression #### \n")

@@ -42,4 +42,3 @@ lp(m)
 lp(m, type = "x", format = "list")
 lp(m, lp = 1, type = "link")
 }
-

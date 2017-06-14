@@ -13,10 +13,11 @@ void calcLP(arma::mat& data, const arma::vec& p, unsigned n_lp,
             const std::vector<IntegerVector >& indexCoef, const std::vector<IntegerVector >& indexEndo, 
             const IntegerVector& indexLP);
 
+//                 const arma::mat& mu, const SEXP& dmu, const arma::mat& S, const SEXP& dS,
 // [[Rcpp::export]]
 arma::mat scoreLVM(arma::mat data, const arma::vec& p, 
-                   const arma::mat& mu, const SEXP& dmu, const arma::mat& S, const SEXP& dS,
-                   const std::vector<IntegerVector >& indexCoef, const std::vector<IntegerVector >& indexEndo,
+                   Function scoreFun, const arma::mat& mu, const arma::mat& dmu, const arma::mat& S, const arma::mat& dS,
+                   const std::vector< IntegerVector >& indexCoef, const std::vector< IntegerVector >& indexEndo,
                    const IntegerVector& indexIntercept,
                    const IntegerVector& indexLP, const IntegerVector& indexManifest,
                    bool indiv){
@@ -28,12 +29,21 @@ arma::mat scoreLVM(arma::mat data, const arma::vec& p,
   
   //// score
   arma::mat Y = data.cols(as<uvec>(indexManifest));
-  arma::mat score = mets::_loglikMVN(Y, // yl
-                                     R_NilValue, // yu
-                                     R_NilValue, // status
-                                     mu, dmu, S, dS, //
-                                     R_NilValue, R_NilValue, R_NilValue, R_NilValue, R_NilValue, true); // z su dsu threshold dthreshold score
-  
+  arma::mat score = as<mat>(scoreFun(Y, mu, S, dmu, dS));
+  // arma::mat score = mets::_loglikMVN(Y, // arma::mat Yl
+  //                                    R_NilValue, // SEXP yu
+  //                                    R_NilValue, // SEXP status
+  //                                    mu, // arma::mat Mu
+  //                                    dmu, // SEXP dmu
+  //                                    S, // arma::mat S
+  //                                    dS, // SEXP ds
+  //                                    R_NilValue, // SEXP z
+  //                                    R_NilValue, // SEXP su
+  //                                    R_NilValue, // SEXP dsu
+  //                                    R_NilValue, // SEXP threshold
+  //                                    R_NilValue, // SEXP dthreshold
+  //                                    true); // z su dsu threshold dthreshold score
+    
   //// chain rule
   arma::mat X;
   

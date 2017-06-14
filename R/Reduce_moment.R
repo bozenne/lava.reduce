@@ -1,12 +1,3 @@
-# scoreMVN_mets <- function(Y, mu, dmu, S, dS){
-#   
-#   .Call("loglikMVN", yl = Y, yu = NULL, status = NULL, 
-#         mu = mu, dmu = dmu, s = S, 
-#         ds = dS, z = NULL, su = NULL, dsu = NULL, 
-#         threshold = NULL, dthreshold = NULL, score = TRUE, PACKAGE = "mets")
-#   
-# }
-
 #' @title Moments for a reduced lvm model
 #' @name momentLVMr
 #' @description Compute the likelihood, score and hessian of a reduced lvm model
@@ -108,15 +99,15 @@ gaussianLP_score.lvm <- function(x, p, data, indiv = FALSE, implementation = "R"
   M <- moments(x,p) # lava:::moments.lvm
   D <- callS3methodParent(x, FUN = "deriv", class = "lvm.reduced",p=p)
   
-  
   if(implementation == "cpp"){
-    
+   
     score <- scoreLVM(data = as.matrix(data),
                       p = p,
                       mu = M$xi%x%rep(1,NROW(data)),
                       S = M$C,
                       dmu = D$dxi,
                       dS = D$dS,
+                      scoreFun = mets::scoreMVN,
                       indexCoef = lapply(lp.link, function(link){match(link, names.p) - 1}),
                       indexEndo = lapply(lp.x, function(link){match(link, names.data) - 1}),
                       indexIntercept = match(lp.endo, names.p) - 1,

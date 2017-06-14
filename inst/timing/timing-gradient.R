@@ -1,5 +1,5 @@
 library(ggplot2)
-library(lava.reduce)
+library(lavaReduce)
 library(rbenchmark)
 library(data.table)
 library(R.utils)
@@ -15,7 +15,7 @@ for(iter_p in 1:n.p){
   # model
   m <- lvm()
   m <- regression(m,y='y1',x='x'%++%1:seq_p[iter_p])
-  mR <- reduce(m)
+  mR <- reduce(m, clean = TRUE)
   
   # simul
   d <- sim(m,n)
@@ -25,11 +25,22 @@ for(iter_p in 1:n.p){
   start1 <- coef(e1)[coef(mR)]
   start2 <- coef(e1)
   
+  gaussianLP_score.lvm(x = mR, data = as.matrix(d), p = start1, method = "R")
+  gaussianLP_score.lvm(x = mR, data = as.matrix(d), p = start1, implementation = "cpp")
+  ben <- rbenchmark::benchmark(reduceCpp = ,
+                               reduceR = ,
+                               lava = lava:::gaussian_gradient.lvm(x = e1$model, data = d, p = start2, n = e1$data$n, mu = e1$mu, S = e1$S),  # default
+                               replications = 10
+  )
+  gaussianLP_score.lvm
+  
+  
+  
   # FUN <- function(){gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "cpp")}
   # butils::profileCode(FUN)
-  ben <- rbenchmark::benchmark(gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "cpp"),
-                               gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "R"),
-                               lava:::gaussian_gradient.lvm(x = e1$model, data = d, p = start2, n = e1$data$n, mu = e1$mu, S = e1$S),  # default
+  ben <- rbenchmark::benchmark(reduceCpp = gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "cpp"),
+                               reduceR = gaussianLP_gradient.lvm(x = mR, data = as.matrix(d), p = start1, method = "R"),
+                               lava = lava:::gaussian_gradient.lvm(x = e1$model, data = d, p = start2, n = e1$data$n, mu = e1$mu, S = e1$S),  # default
                                replications = 10
   )
   
@@ -39,6 +50,7 @@ for(iter_p in 1:n.p){
               cbind(as.data.table(ben[c("test","elapsed")]), p = seq_p[iter_p])
   )
 }
+
 
 dt[, test := factor(test, labels = c("lava.reduceCpp","lava.reduceR","lava"))]
 

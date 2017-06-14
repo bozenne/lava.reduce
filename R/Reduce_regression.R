@@ -88,7 +88,6 @@ regression.lvm.reduced <- function(object = lvm.reduced(), to, from, y, x, reduc
       stop("cannot integrate endogenous variables in the linear predictor \n",
            "endogenous: \"",paste(from[from %in% lava::endogenous(object)], collapse = "\" \""),"\" \n")
     }
-    allCoef <- coef(lava::regression(object, to = to, from = from, reduce = FALSE, ...))
     if(!identical(reduce,TRUE) && length(reduce)!=length(to)){
       stop("wrong specification of argument \'reduce\' \n",
            "must be TRUE or a character vector of size ",length(to),"\n")
@@ -109,8 +108,11 @@ regression.lvm.reduced <- function(object = lvm.reduced(), to, from, y, x, reduc
               object$lp[[iterR]]$con <- rep(NA,length(from))
               object$lp[[iterR]]$name <- name.LP
           }
+          allCoef <- paste0(iterR, lava.options()$symbols[1], object$lp[[iterR]]$x)
+          lava::parameter(object) <- c(lava::parameter(object), setdiff(allCoef,coef(object)))
+          
+          
       }
-      lava::parameter(object) <- setdiff(allCoef,coef(object))
       return(object)
     
   } else {

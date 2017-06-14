@@ -8,10 +8,10 @@
 */
 
 /* .Call calls */
-extern SEXP lavaReduce_scoreLVM(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP lavaReduce_scoreLVM(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"lavaReduce_scoreLVM", (DL_FUNC) &lavaReduce_scoreLVM, 12},
+    {"lavaReduce_scoreLVM", (DL_FUNC) &lavaReduce_scoreLVM, 13},
     {NULL, NULL, 0}
 };
 

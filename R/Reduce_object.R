@@ -107,18 +107,18 @@ lvm2reduce <- function(x){
 #' @rdname reduce
 #' @export
 reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
-
-   myhooks <- gethook_lavaReduce("reduce.hooks")
-   for (f in myhooks) {
-       res <- do.call(f, list(x=x, link = link, ...))
-       if("x" %in% names(res)){x <- res$x}
-       if("link" %in% names(res)){link <- res$link}
-   }
-    
-  if(is.null(link)){ # reduce the linear predictor of specific endogeneous variables
   
+  myhooks <- gethook_lavaReduce("reduce.hooks")
+  for (f in myhooks) {
+    res <- do.call(f, list(x=x, link = link, ...))
+    if("x" %in% names(res)){x <- res$x}
+    if("link" %in% names(res)){link <- res$link}
+  }
+  
+  if(is.null(link)){ # reduce the linear predictor of specific endogeneous variables
+    
     if(is.null(endo)){endo <- lava::endogenous(x)}
-
+    
     # if nothing to reduce return object
     remaining.exo <- intersect(vars(x, lp = FALSE), 
                                exogenous(x, lp = FALSE, xlp = TRUE))
@@ -135,33 +135,50 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
       return(x)
     }
     
+    ## define all links
     link <- paste(colnames(M)[oneSearch[,2]],
                   rownames(M)[oneSearch[,1]],
                   sep = lava.options()$symbols[1])
     
+    ## define exogeneous variables relative to each endogenous variable
+    all.y <- colnames(M)
+    n.y <- length(all.y)
+    ls.x <- lapply(1:n.y, function(iY){
+      if(any(oneSearch[,2]==iY)){
+        rownames(M)[oneSearch[oneSearch[,2]==iY,1]]
+      }
+    })
+    names(ls.x) <- all.y
+    ls.x <- ls.x[lengths(ls.x)>0]
+  }else{
+    ls.xy <- initVar_links(link, format = "list")
+    ls.x <- tapply(ls.xy$var2, ls.xy$var1, function(x){x})
   }
   
-    #### define the links
-    # can be problematic as we don't know about "additive" or other possibly relevant arguments
-    ls.link <- combine.formula(link)
+  all.y <- names(ls.x)
+  n.y <- length(ls.x)
   
-    #### reduce
-    n.endo <- length(ls.link)
-    if("lvm.reduced" %in% class(x) == FALSE){
-        x <- lvm2reduce(x)
-    }
-
-    x.class <- class(x)
-    class(x) <- c("lvm.reduced","lvm")    
-    for(iterR in 1:n.endo){# iterR <- 1        
-        cancel(x) <- ls.link[[iterR]]
-        regression(x, reduce = TRUE) <- ls.link[[iterR]]
-    }
-    class(x) <- x.class
-
-    if(clean){
-        x <- clean(x, ...)
-    }
+ #### define the links
+  # can be problematic as we don't know about "additive" or other possibly relevant arguments
+  ls.link <- combine.formula(link)
+  
+  #### reduce
+  n.endo <- length(ls.link)
+  if("lvm.reduced" %in% class(x) == FALSE){
+    x <- lvm2reduce(x)
+  }
+  
+  x.class <- class(x)
+  class(x) <- c("lvm.reduced","lvm")    
+  for(iterR in 1:n.endo){# iterR <- 1        
+    cancel(x) <- ls.link[[iterR]]
+    x <- regression.lvm.reduced(x, reduce = TRUE, y = all.y[iterR], x = ls.x[[all.y[iterR]]])
+  }
+  class(x) <- x.class
+  
+  if(clean){
+    x <- clean(x, ...)
+  }
   
   return(x)
 }

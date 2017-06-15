@@ -69,6 +69,15 @@ vars.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...){
   return(setdiff(allVars,names.lp))
 }
 # }}}
+
+# {{{ vars.lvmfit.reduced
+#' @rdname getReduce 
+#' @export
+vars.lvmfit.reduced <- function(x, lp = FALSE, xlp = TRUE, ...){
+  return(vars(Model(x), lp = lp, xlp = xlp, ...))
+}
+# }}}
+
 # {{{ exogenous.lvm.reduced
 #' @rdname getReduce 
 #' @export
@@ -91,6 +100,15 @@ exogenous.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...){
   return(setdiff(allExo, names.lp))
 }
 # }}}
+
+# {{{ exogenous.lvmfit.reduced
+#' @rdname getReduce 
+#' @export
+exogenous.lvmfit.reduced <- function(x, lp = FALSE, xlp = TRUE, ...){
+  return(exogenous(Model(x), lp = lp, xlp = xlp, ...))
+}
+# }}}
+
 # {{{ endogenous.lvm.reduced
 #' @rdname getReduce 
 #' @export
@@ -111,6 +129,15 @@ endogenous.lvm.reduced <- function(x, top = FALSE, latent = FALSE, ...){
   
 }
 # }}}
+
+# {{{ endogenous.lvmfit.reduced
+#' @rdname getReduce 
+#' @export
+endogenous.lvmfit.reduced <- function(x, lp = FALSE, xlp = TRUE, ...){
+  return(endogenous(Model(x), lp = lp, xlp = xlp, ...))
+}
+# }}}
+
 # {{{ manifest.lvm.reduced
 #' @rdname getReduce
 #' @export
@@ -121,5 +148,13 @@ manifest.lvm.reduced <- function(x, lp = TRUE, xlp = FALSE, ...) {
     setdiff(vars, lava::latent(x))
   else
     NULL
+}
+# }}}
+
+# {{{ manifest.lvmfit.reduced
+#' @rdname getReduce 
+#' @export
+manifest.lvmfit.reduced <- function(x, lp = FALSE, xlp = TRUE, ...){
+  return(manifest(Model(x), lp = lp, xlp = xlp, ...))
 }
 # }}}

@@ -3,18 +3,30 @@
 \name{getReduce}
 \alias{getReduce}
 \alias{vars.lvm.reduced}
+\alias{vars.lvmfit.reduced}
 \alias{exogenous.lvm.reduced}
+\alias{exogenous.lvmfit.reduced}
 \alias{endogenous.lvm.reduced}
+\alias{endogenous.lvmfit.reduced}
 \alias{manifest.lvm.reduced}
+\alias{manifest.lvmfit.reduced}
 \title{Extract variables from a reduced latent variable model}
 \usage{
 \method{vars}{lvm.reduced}(x, lp = TRUE, xlp = FALSE, ...)
 
+\method{vars}{lvmfit.reduced}(x, lp = FALSE, xlp = TRUE, ...)
+
 \method{exogenous}{lvm.reduced}(x, lp = TRUE, xlp = FALSE, ...)
+
+\method{exogenous}{lvmfit.reduced}(x, lp = FALSE, xlp = TRUE, ...)
 
 \method{endogenous}{lvm.reduced}(x, top = FALSE, latent = FALSE, ...)
 
+\method{endogenous}{lvmfit.reduced}(x, lp = FALSE, xlp = TRUE, ...)
+
 \method{manifest}{lvm.reduced}(x, lp = TRUE, xlp = FALSE, ...)
+
+\method{manifest}{lvmfit.reduced}(x, lp = FALSE, xlp = TRUE, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}

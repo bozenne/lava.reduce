@@ -52,6 +52,79 @@ lvm2reduce <- function(x){
   return(x)
 }
 
+#' @title Remove all linear predictors from a lvm.reduce object
+#' @description Remove all linear predictors from a lvm.reduce object. Restaure the links with the covariates.
+#' @name reduce2lvm
+#' 
+#' @param x \code{lvm}-object
+#' @param ... not used.
+#' 
+#' @examples 
+#' m <- lvm(Y~X1+X2+X3)
+#' mR <- reduce(m)
+#' 
+#' reduce2lvm(mR)
+#' 
+#' m <- lvm(c(Y1~X1+X2+X3,Y2~Z1+X3))
+#' mR <- reduce(m)
+#' regression(mR) <- Y3~X1+X8
+#' reduce2lvm(mR)
+#'  
+#' @export
+`reduce2lvm` <-
+  function(x,...) UseMethod("reduce2lvm")
+# }}}
+
+#' @rdname reduce2lvm
+#' @export
+reduce2lvm.lvm.reduced <- function(x){
+  
+  if("lvm.reduced" %in% class(x)){
+     
+    allLinks <- paste0(lp(x,type = "endo"),lava.options()$symbols[1],lp(x,type = "name"))
+    
+    for(iLP in 1:length(allLinks)){ # iLP <- 1
+      allLinks[iLP] <- gsub(lava.options()$symbols[1],"~",allLinks[iLP])
+      cancel(x, restaure = TRUE) <- as.formula(allLinks[iLP])
+    }
+    
+    x <- clean(x, rm.endo = FALSE)
+    
+  }else{
+    warning("x is already a reduced latent variable model \n")
+  }
+  
+  return(x)
+}
+
+#' @rdname reduce2lvm
+#' @export
+reduce2lvm.lvmfit.reduced <- function(x){
+   
+  data <- model.frame(x)
+  xfull <- reduce2lvm(Model(x))
+    
+  ## from lava::estimate
+  resProc <- procdata.lvm(xfull,data=data)
+  xfix <- setdiff(colnames(data)[(colnames(data) %in% parlabels(xfull, exo = TRUE))], latent(xfull))
+  fix <- ifelse(length(xfix) > 0, FALSE, TRUE)
+  xfull <- fixsome(xfull, measurement.fix = fix, S = resProc$S, mu = resProc$mu, 
+                   n = resProc$n, debug = FALSE)
+  
+  if (length(xfix) > 0) {
+    index(xfull) <- reindex(xfull, sparse = FALSE, zeroones = TRUE, 
+                        deriv = TRUE)
+  }
+  else {
+    xfull <- updatelvm(xfull, sparse = FALSE, zeroones = TRUE, 
+                   deriv = TRUE, mean = TRUE)
+  }
+  
+  ## export
+  return(xfull)
+}
+
+
 # }}}
 # {{{ reduce
 
@@ -169,12 +242,12 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
   }
   
   x.class <- class(x)
-  class(x) <- c("lvm.reduced","lvm")    
+  class(x) <- append("lvm.reduced",x.class)    
   for(iterR in 1:n.endo){# iterR <- 1        
     cancel(x) <- ls.link[[iterR]]
   }
   if(clean){
-    x <- clean(x, ...)
+    x <- clean(x, rm.endo = FALSE, ...)
   }
   for(iterR in 1:n.endo){# iterR <- 1        
     x <- regression.lvm.reduced(x, reduce = TRUE, y = all.y[iterR], x = ls.x[[all.y[iterR]]])
@@ -186,4 +259,3 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
 }
 # }}}
 
-# }}}

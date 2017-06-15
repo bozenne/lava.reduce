@@ -68,6 +68,12 @@ lavaReduce.estimate.hook <- function(x,data,estimator,...) {
 #' @export
 lavaReduce.post.hook <- function(x){
   
+  if("lvm.reduced" %in% class(x$model)){
+    
+    class(x) <- append("lvmfit.reduced",class(x))
+  
+  }
+  
   return(x)
   
 }
@@ -218,6 +224,11 @@ lavaReduce.cancel.hook  <- function(x, value,
       ## argument coming from lavaReduce.remove.hook
       allCoef <- initVar_links(value, format = "txt.formula")
     }
+     
+    ## revert LP to original variables
+     if(restaure == TRUE && value[2] %in% lp(x,"name")){
+       allCoef <- lp(x, "link")
+     }
     
     ## coefficients in LP
     allCoef.lp <- intersect(allCoef, lp(x, "link"))
@@ -239,6 +250,7 @@ lavaReduce.cancel.hook  <- function(x, value,
         newlp.x <- newlp[[1]]$x
         
         indexRM <- which(newlp.link %in% iCoef.lp)
+        
         
         ## restaure the links removed from the lp in the lvm               
         if(restaure){                   

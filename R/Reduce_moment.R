@@ -1,3 +1,17 @@
+#' @title Extract moments from a reduced lvm
+#' @description Extract moments from a reduced lvm
+#' 
+#' @param x latent variable model
+#' @param p Parameter vector used to calculate statistics
+#' @param ... additional arguments to be passed to the low level functions
+#' 
+
+#' @export
+moments.lvmfit.reduced <- function (x, p = pars(x), ...) {
+  xfull <- reduce2lvm(x)
+  moments(xfull, p = p[coef(xfull)], ...)
+}
+
 #' @title Moments for a reduced lvm model
 #' @name momentLVMr
 #' @description Compute the likelihood, score and hessian of a reduced lvm model

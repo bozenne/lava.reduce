@@ -9,11 +9,18 @@ context("#### destructors #### \n")
 
 lava.options(symbols = c("~","~~"))
 
+mFull <- lvm()
+mFull <- regression(mFull, x=paste0("x",1:10),y="y1")
+mFull <- regression(mFull, x=paste0("x",1:10),y="y2")
+mFull <- regression(mFull, x=c("z1","z2"),y="y1")
+mFull <- regression(mFull, x=c("z3"),y="y2")
+
 m <- lvm.reduced()
 m <- regression(m, x=paste0("x",1:10),y="y1", reduce = TRUE)
 m <- regression(m, x=paste0("x",1:10),y="y2", reduce = TRUE)
 m <- regression(m, x=c("z1","z2"),y="y1")
 m <- regression(m, x=c("z3"),y="y2")
+
 
 # {{{ cancel
 test_that("cancel coefficient not in lp (compatibility with lava)", {
@@ -85,6 +92,15 @@ test_that("remove a complete lp", {
 
     mc <- cancel(m, coef2RM) ; mc <- clean(mc)
     expect_false("lvm.reduced" %in% class(mc))
+})
+
+test_that("from reduce to normal", {
+  
+  mi <- reduce2lvm(m)
+  expect_false("lvm.reduced" %in% class(mi))
+  expect_equal(as.character(sort(coef(mi))),
+               as.character(sort(coef(m))))
+
 })
 # }}}
 

@@ -40,11 +40,18 @@ test_that("Gradient from lava match those of lavaReduce", {
 
 test_that("Compare results of the estimation",{
   res1 <- estimate(m,d)
+  
   res2 <- estimate(mR,d, control = list(constrain = TRUE))
+  
   res3 <- estimate(mR2,d, control = list(constrain = TRUE))
   expect_equal(coef(res1),coef(res2)[names(coef(res1))], tol = 1e-5)
   expect_equal(coef(res1),coef(res3)[names(coef(res1))], tol = 1e-5)
+  
+  xfull <- reduce2lvm(res2)
+  sd1 <- lava:::stdcoef(res1)
+  sd2 <- lava:::stdcoef(xfull, p = coef(res2)[coef(xfull)])
+  expect_equal(sd1,sd2,tol = 1e-5)
 })
 
-
-
+## problem
+# res2$coef != res1$coef

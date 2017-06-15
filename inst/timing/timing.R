@@ -83,3 +83,36 @@ ggsave(ggIter, file = "lava.reduce/inst/timing/plotIter.svg")
 
 
 
+# {{{ Example
+
+if(FALSE){
+    
+    library(lavaReduce)
+
+    n <- 100
+    p <- 10
+
+    m <- lvm()
+    m <- regression(m,y='y1',x='x'%++%1:p)
+    mR <- reduce(m, clean = TRUE, rm.exo = TRUE)
+    
+    mR2 <- lvm.reduced()  # FASTER
+    mR2 <- regression(mR2,y='y1',x='x'%++%1:p, reduce = TRUE)
+    expect_equal(mR,mR2)
+
+    mR$M
+    mR2$M
+
+    # simul
+    d <- sim(m,n)
+    d[,lp(mR)] <- 0
+
+    #### gradient
+    e1 <- estimate(m,d)
+    start1 <- coef(e1)[coef(mR)]
+    start2 <- coef(e1)
+
+}
+
+
+# }}}

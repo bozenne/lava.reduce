@@ -5,7 +5,7 @@
 #' @import lava
 #' @importFrom mets loglikMVN scoreMVN
 #' @importFrom numDeriv jacobian
-#' @importFrom stats as.formula coef delete.response predict setNames terms
+#' @importFrom stats as.formula coef delete.response model.frame predict setNames terms
 #' @importFrom utils getS3method
 #' @useDynLib lavaReduce, .registration=TRUE
 NULL

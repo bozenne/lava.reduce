@@ -77,7 +77,7 @@ lvm2reduce <- function(x){
 
 #' @rdname reduce2lvm
 #' @export
-reduce2lvm.lvm.reduced <- function(x){
+reduce2lvm.lvm.reduced <- function(x, ...){
   
   if("lvm.reduced" %in% class(x)){
      
@@ -99,7 +99,7 @@ reduce2lvm.lvm.reduced <- function(x){
 
 #' @rdname reduce2lvm
 #' @export
-reduce2lvm.lvmfit.reduced <- function(x){
+reduce2lvm.lvmfit.reduced <- function(x, ...){
    
   data <- model.frame(x)
   xfull <- reduce2lvm(Model(x))

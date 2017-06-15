@@ -141,7 +141,7 @@ lavaReduce.clean.hook <- function(x, rm.exo,
             if(rm.exo && length(var.exogenous) > 0){
                 indexClean.reg <- which(rowSums(M.reg[var.exogenous,,drop = FALSE]!=0)==0)
                 indexClean.cov <- which(rowSums(M.cov[var.exogenous,,drop = FALSE]!=0)==0)
-                indexClean.lp <- which(var.exogenous %in% lp(x, type = "x") == FALSE)
+                # indexClean.lp <- which(var.exogenous %in% lp(x, type = "x") == FALSE)
                 indexClean <- intersect(indexClean.reg, intersect(indexClean.cov, indexClean.lp))
                 if(length(indexClean)>0){
                     x <- kill(x, value =  var.exogenous[indexClean])

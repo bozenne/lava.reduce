@@ -172,13 +172,15 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
   class(x) <- c("lvm.reduced","lvm")    
   for(iterR in 1:n.endo){# iterR <- 1        
     cancel(x) <- ls.link[[iterR]]
+  }
+  if(clean){
+    x <- clean(x, ...)
+  }
+  for(iterR in 1:n.endo){# iterR <- 1        
     x <- regression.lvm.reduced(x, reduce = TRUE, y = all.y[iterR], x = ls.x[[all.y[iterR]]])
   }
   class(x) <- x.class
   
-  if(clean){
-    x <- clean(x, ...)
-  }
   
   return(x)
 }

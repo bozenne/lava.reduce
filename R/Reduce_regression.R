@@ -110,8 +110,7 @@ regression.lvm.reduced <- function(object = lvm.reduced(), to, from, y, x, reduc
           }
           allCoef <- paste0(iterR, lava.options()$symbols[1], object$lp[[iterR]]$x)
           lava::parameter(object) <- c(lava::parameter(object), setdiff(allCoef,coef(object)))
-          
-          
+          #addvar(object) <- setdiff(object$lp[[iterR]]$x, vars(object))
       }
       return(object)
     

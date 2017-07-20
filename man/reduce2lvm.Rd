@@ -8,9 +8,9 @@
 \usage{
 reduce2lvm(x, ...)
 
-\method{reduce2lvm}{lvm.reduced}(x)
+\method{reduce2lvm}{lvm.reduced}(x, ...)
 
-\method{reduce2lvm}{lvmfit.reduced}(x)
+\method{reduce2lvm}{lvmfit.reduced}(x, ...)
 }
 \arguments{
 \item{x}{\code{lvm}-object}

@@ -62,7 +62,7 @@
 #' @export
 clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
 
-    myhooks <- gethook_lavaReduce("clean.hooks")
+    myhooks <- lavaReduce::gethook_lavaReduce("clean.hooks")
     for (f in myhooks) {
         res <- do.call(f, list(x=x, rm.exo=rm.exo,...))
         if("x" %in% names(res)){ x <- res$x }
@@ -101,7 +101,7 @@ clean.lvm <- function(x, rm.exo = TRUE, rm.endo = TRUE, rm.latent = TRUE, ...){
     }
     
     if(length(varClean)>0){
-        x <- kill(x, value =  varClean)
+        x <- kill(x, value =  varClean, ...)
     }
     return(x)
 }

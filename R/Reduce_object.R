@@ -181,11 +181,13 @@ reduce2lvm.lvmfit.reduced <- function(x, ...){
 #' @export
 reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
   
-  myhooks <- gethook_lavaReduce("reduce.hooks")
+  myhooks <- lavaReduce::gethook_lavaReduce("reduce.hooks")
+  save <- NULL
   for (f in myhooks) {
-    res <- do.call(f, list(x=x, link = link, ...))
-    if("x" %in% names(res)){x <- res$x}
-    if("link" %in% names(res)){link <- res$link}
+    resHook <- do.call(f, list(x=x, link = link, ...))
+    if("x" %in% names(resHook)){x <- resHook$x}
+    if("link" %in% names(resHook)){link <- resHook$link}
+    if("save" %in% names(resHook)){save <- c(save,resHook$save)}
   }
   
   if(is.null(link)){ # reduce the linear predictor of specific endogeneous variables
@@ -243,17 +245,24 @@ reduce.lvm <- function(x, link = NULL, endo = NULL, clean = TRUE, ...){
   
   x.class <- class(x)
   class(x) <- append("lvm.reduced",x.class)    
+  
   for(iterR in 1:n.endo){# iterR <- 1        
     cancel(x) <- ls.link[[iterR]]
   }
   if(clean){
-    x <- clean(x, rm.endo = FALSE, ...)
+    x <- clean(x, rm.endo = FALSE)
   }
   for(iterR in 1:n.endo){# iterR <- 1        
     x <- regression.lvm.reduced(x, reduce = TRUE, y = all.y[iterR], x = ls.x[[all.y[iterR]]])
   }
   class(x) <- x.class
   
+  # restaure
+  if(!is.null(save)){
+    for(iElement in names(save)){
+    x[[iElement]] <- save[[iElement]]
+    }
+  }
   
   return(x)
 }
